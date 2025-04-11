@@ -1,0 +1,13 @@
+{
+    "id": "MilanMod",
+    "name": "Milan's first mod",
+    "author": ["Milan"],
+    "description": "First mod. Please let this work.",
+    "prefix": "mlnc",
+    "main_file": "milanmod.lua",
+    "badge_colour": "008000",
+    "dependencies": [
+        "Steamodded (>=1.0.0~ALPHA-1225a)"
+    ],
+    "version": "1.0.0"
+}
