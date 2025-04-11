@@ -143,8 +143,7 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Red Joker',
 		text = {
-			"Gains {C:chips}+#1# {}chips per",
-			"{C:Red}Discard {} used when joker is used",
+			"Gains {C:chips}+#1# {}chips per discard",
 			"{C:inactive}(Currently {C:chips}+#2# {C:inactive}chips)"
 		}
 	},
@@ -157,7 +156,7 @@ SMODS.Joker {
 
 	rarity = 1,
 	atlas = 'MilanMod',
-	pos = { x = 4, y = 0 },
+	pos = { x = 3, y = 0 },
 	cost = 4,
 
 	unlocked = true,
@@ -171,7 +170,7 @@ SMODS.Joker {
 				message = localize{type='variable', key='a_chips', vars = {card.ability.extra.chips}}
 			}
 		end
-		if context.discard then
+		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand]then
 			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chips_gain
 			return {
 				message = '+15 chips',
