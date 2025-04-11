@@ -43,3 +43,47 @@ SMODS.Joker{
 	end
 }
 
+SMODS.Joker{
+	key = 'circle_joker'
+
+	loc_txt = {
+		name = 'Circle Joker',
+		text = {
+			"If hand contains 1 card",
+			"this joker gains {C:mult}#2# {} mult",
+			"and {C:chips}#4# {} chips",
+			"{C:inactive}(Currently {C:chips}+#3#{C:inactive} Chips & {C:mult} +#1#{} Mult)
+		}
+	}
+
+	config = { extra = {mult = 0, mult_gain = 3, chips = 0, chip_gain = 14}}
+
+	rarity = 2,
+	atlas = 'MilandMod'
+	pos { x = 1, y = 0},
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.mult,  card.ability.extra.mult_gain, card.ability.extra.chips, card.ability.extra.chip_gain } }
+	end,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			mult = card.ability.extra.mult,
+			chips = card.ability.extra.chips
+
+		end
+		if context.before and #context.full_hand == 1 and not context.blueprint then
+			self.ability.extra.chips = self.ability.extra.chips + self.ability.extra.chip_gain,
+			self.ability.extra.mult = self.ability.extra.mult + self.ability.extra.mult_gain -- maybe change to self.extra? spare trousers does it like that
+			return {
+				message = 'Upgrade'!,
+				card = card
+			}
+		end
+	end
+}
