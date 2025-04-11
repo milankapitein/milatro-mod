@@ -50,9 +50,9 @@ SMODS.Joker{
 		name = 'Circle Joker',
 		text = {
 			"If hand contains 1 card",
-			"this joker gains {C:mult}#2# {} mult",
-			"and {C:chips}#4# {} chips",
-			"{C:inactive}(Currently {C:chips}+#3#{C:inactive} Chips & {C:mult} +#1#{} Mult)"
+			"this joker gains {C:mult}#2# {}Mult",
+			"and {C:chips}#4# {}chips",
+			"{C:inactive}(Currently {C:mult}+#1# {C:inactive}Mult & {C:chips}+#3# {C:inactive}Chips)"
 		}
 	},
 
@@ -75,9 +75,10 @@ SMODS.Joker{
 		if context.joker_main then
 			return {
 				mult_mod = card.ability.extra.mult,
-				chip_mod = card.ability.extra.chips
+				chip_mod = card.ability.extra.chips,
+				--TODO: currently only says +mult, add definition to dictionary for both mult and chips so it prints that correctly
+				message = localize{type='variable', key='a_mult', vars = {card.ability.extra.mult} } 
 			}
-
 		end
 		if context.before and #context.full_hand == 1 and not context.blueprint then
 			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_gain

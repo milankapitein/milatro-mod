@@ -2,12 +2,12 @@
     "id": "MilanMod",
     "name": "Milan Mod",
     "author": ["Milan"],
-    "description": "My first mod. Adds 1 Joker",
+    "description": "Milan's cool mod that adds a bunch of jokers",
     "prefix": "mlnc",
     "main_file": "milanmod.lua",
     "badge_colour": "008000",
     "dependencies": [
         "Steamodded (>=1.0.0~ALPHA-1225a)"
     ],
-    "version": "0.1.0"
+    "version": "0.2.0"
 }
