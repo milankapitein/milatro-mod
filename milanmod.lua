@@ -9,6 +9,7 @@ SMODS.Atlas {
 	py = 95
 }
 
+-- Humble Joker
 SMODS.Joker{
     key = 'humble_joker',
 
@@ -43,6 +44,7 @@ SMODS.Joker{
 	end
 }
 
+-- Circle Joker
 SMODS.Joker{
 	key = 'circle_joker',
 
@@ -57,6 +59,9 @@ SMODS.Joker{
 	},
 
 	config = { extra = {mult = 0, mult_gain = 3, chips = 0, chip_gain = 14 } },
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.mult, card.ability.extra.mult_gain, card.ability.extra.chips, card.ability.extra.chip_gain } }
+	end,
 
 	rarity = 2,
 	atlas = 'MilanMod',
@@ -67,9 +72,7 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = true,
 
-	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.mult, card.ability.extra.mult_gain, card.ability.extra.chips, card.ability.extra.chip_gain } }
-	end,
+
 
 	calculate = function(self, card, context)
 		if context.joker_main then
@@ -86,6 +89,47 @@ SMODS.Joker{
 			return {
 				message = 'Upgrade!',
 				card = card
+			}
+		end
+	end
+}
+
+SMODS.Joker {
+	key = 'spectral_teller',
+	loc_txt = {
+		name = 'Spectral Teller',
+		text = {
+			"Gains {C:white,X:mult}X#1#{} Mult per",
+			"unique Spectral card used this run",
+			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = { Xmult_gain = 0.5, Xmult = 1}},
+
+
+	loc_vars = function(self, info_queue, card)
+		local spectral_used = 0
+		for k, v in pairs(G.GAME.consumeable_usage) do if v.set == 'Spectral' then spectral_used = spectral_used + 1 end end
+		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain   } }
+	end,
+
+	rarity = 3,
+	atlas = 'MilanMod',
+	pos = {x = 2, y = 0},
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local spectral_used = 0
+			for k, v in pairs(G.GAME.consumeable_usage) do if v.set == 'Spectral' then spectral_used = spectral_used + 1 end end
+			return {
+				Xmult_mod = card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain,
+				message = localize{type='variable', key='a_xmult', vars = {card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain} }
 			}
 		end
 	end
