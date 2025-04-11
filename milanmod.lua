@@ -94,6 +94,7 @@ SMODS.Joker{
 	end
 }
 
+-- Spectral Teller, change name PLS
 SMODS.Joker {
 	key = 'spectral_teller',
 	loc_txt = {
@@ -133,4 +134,51 @@ SMODS.Joker {
 			}
 		end
 	end
+}
+
+-- Red Joker
+SMODS.Joker {
+	key = 'red_joker',
+
+	loc_txt = {
+		name = 'Red Joker',
+		text = {
+			"Gains {C:chips}+#1# {}chips per",
+			"{C:Red}Discard {} used when joker is used",
+			"{C:inactive}(Currently {C:chips}+#2# {C:inactive}chips)"
+		}
+	},
+
+	config = { extra = { chips_gain = 15, chips = 0} },
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.chips_gain, card.ability.extra.chips } }
+	end,
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 4, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				chip_mod = card.ability.extra.chips,
+				message = localize{type='variable', key='a_chips', vars = {card.ability.extra.chips}}
+			}
+		end
+		if context.discard then
+			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chips_gain
+			return {
+				message = '+15 chips',
+				colour = G.C.CHIPS,
+				card = card
+			}
+		end
+	end
+
 }
