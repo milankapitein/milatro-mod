@@ -68,7 +68,7 @@ SMODS.Joker{
 	blueprint_compat = true,
 
 	loc_vars = function(self, info_queue, card)
-		return { vars = { card.ability.extra.mult,  card.ability.extra.mult_gain, card.ability.extra.chips, card.ability.extra.chip_gain } }
+		return { vars = { card.ability.extra.mult, card.ability.extra.mult_gain, card.ability.extra.chips, card.ability.extra.chip_gain } }
 	end,
 
 	calculate = function(self, card, context)
@@ -80,8 +80,8 @@ SMODS.Joker{
 
 		end
 		if context.before and #context.full_hand == 1 and not context.blueprint then
-			self.ability.extra.chips = self.ability.extra.chips + self.ability.extra.chip_gain
-			self.ability.extra.mult = self.ability.extra.mult + self.ability.extra.mult_gain -- maybe change to self.extra? spare trousers does it like that
+			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_gain
+			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain -- maybe change to self.extra? spare trousers does it like that
 			return {
 				message = 'Upgrade!',
 				card = card
