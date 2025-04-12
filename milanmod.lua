@@ -157,7 +157,7 @@ SMODS.Joker {
 	rarity = 1,
 	atlas = 'MilanMod',
 	pos = { x = 3, y = 0 },
-	cost = 4,
+	cost = 5,
 
 	unlocked = true,
 	discovered = true,
@@ -179,5 +179,97 @@ SMODS.Joker {
 			}
 		end
 	end
+}
+
+-- Rigged Wheel
+SMODS.Joker{
+	key = 'rigged_wheel',
+
+	loc_txt = {
+		name = 'Rigged Wheel',
+		text = {
+			"All Editions from the Wheel of Fortune",
+			"are equally likely, including {C:dark_edition}Negative{}."
+		}
+	},
+
+	config = { extra = {}},
+
+	loc_vars = function(self, info_queue, card)
+		-- This is the way to add an info_queue, which is extra information about other cards
+		-- like Stone Cards on Marble/Stone Jokers, Steel Cards on Steel Joker, and
+		-- in this case, information about negative editions on Perkeo.
+		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
+	end,
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 4, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	add_to_deck = function(self, card, from_debuff)
+		local original_poll_edition = poll_edition
+		function poll_edition(key, mod, no_neg, guaranteed)
+			mod = mod or 1
+			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
+			if guaranteed then
+				if edition_poll > 1 - 0.003*25 then
+					return {negative = true}
+				elseif edition_poll > 1 - 0.006*25 then
+					return {polychrome = true}
+				elseif edition_poll > 1 - 0.02*25 then
+					return {holo = true}
+				elseif edition_poll > 1 - 0.04*25 then
+					return {foil = true}
+				end
+			else
+				if edition_poll > 1 - 0.01725*mod then
+					return {negative = true}
+				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
+					return {polychrome = true}
+				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
+					return {holo = true}
+				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
+					return {foil = true}
+				end
+			end
+			return nil
+		end
+	end,
+
+	remove_from_deck = function(self, card, from_debuff)
+		local original_poll_edition = poll_edition
+		function poll_edition(key, mod, no_neg, guaranteed)
+			mod = mod or 1
+			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
+			if guaranteed then
+				if edition_poll > 1 - 0.003*25 then
+					return {negative = true}
+				elseif edition_poll > 1 - 0.006*25 then
+					return {polychrome = true}
+				elseif edition_poll > 1 - 0.02*25 then
+					return {holo = true}
+				elseif edition_poll > 1 - 0.04*25 then
+					return {foil = true}
+				end
+			else
+				if edition_poll > 1 - 0.003*mod then
+					return {negative = true}
+				elseif edition_poll > 1 - 0.006*G.GAME.edition_rate*mod then
+					return {polychrome = true}
+				elseif edition_poll > 1 - 0.02*G.GAME.edition_rate*mod then
+					return {holo = true}
+				elseif edition_poll > 1 - 0.04*G.GAME.edition_rate*mod then
+					return {foil = true}
+				end
+			end
+			return nil
+		end
+	end
 
 }
+
