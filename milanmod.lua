@@ -309,7 +309,7 @@ SMODS.Joker{
 				message = localize{type='variable', key='a_mult', vars = {card.ability.extra.mult}}
 			}
 		end
-		if context.other_card:is_stone() and not context.blueprint then
+		if context.individual and context.cardarea == G.play and context.other_card:get_id() < 0 and not context.blueprint then
 			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
 			return {
 				message = '+3 Mult',
@@ -345,7 +345,7 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.cardarea == G.play and context.repetition and not context.repetition_only then
-			if context.other_card:is_stone() then
+			if context.other_card:get_id() < 0 then
 				return {
 					message = 'Again!',
 					repetitions = card.ability.extra.repetitions,
