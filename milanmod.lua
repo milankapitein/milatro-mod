@@ -274,3 +274,84 @@ SMODS.Joker{
 
 }
 
+-- Brick by brick
+SMODS.Joker{
+	key = 'brick_by_brick',
+
+	loc_txt = {
+		name = 'Brick by Brick',
+		text = {
+			"This Joker gains {C:mult}+#1# {}Mult",
+			"for each scoring Stone card.",
+			"{C:inactive}(Currently {C:mult}+#2# {C:inactive}Mult)"
+		}
+	},
+
+	config = { extra = { mult_gain = 3, mult = 0}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 5, y = 0 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				mult_mod = card.ability.extra.mult,
+				message = localize{type='variable', key='a_mult', vars = {card.ability.extra.mult}}
+			}
+		end
+		if context.other_card:is_stone() and not context.blueprint then
+			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
+			return {
+				message = '+3 Mult',
+				colour = G.C.Mult,
+				card = card
+			}
+		end
+	end
+}
+
+
+-- Miner
+SMODS.Joker{
+	key = 'miner',
+
+	loc_txt = {
+		name = 'Miner',
+		text = {
+			"Retriggers all played Stone cards"
+		}
+	},
+
+	config = { extra = { repetitions = 1 } },
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 6, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+			if context.other_card:is_stone() then
+				return {
+					message = 'Again!',
+					repetitions = card.ability.extra.repetitions,
+					card = context.other_card
+				}
+			end
+		end
+	end
+}
