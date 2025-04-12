@@ -28,7 +28,7 @@ SMODS.Joker{
 	rarity = 2,
 	atlas = 'MilanMod',
 	pos = { x = 0, y = 0 },
-	cost = 6,
+	cost = 7,
 
 	unlocked = true,
 	discovered = true,
@@ -51,9 +51,9 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Circle Joker',
 		text = {
-			"If hand contains 1 card",
-			"this joker gains {C:mult}#2# {}Mult",
-			"and {C:chips}#4# {}chips",
+			"If hand contains {C:attention}1 {}card",
+			"this joker gains {C:mult}+#2# {}Mult",
+			"and {C:chips}+#4# {}Chips",
 			"{C:inactive}(Currently {C:mult}+#1# {C:inactive}Mult & {C:chips}+#3# {C:inactive}Chips)"
 		}
 	},
@@ -63,10 +63,10 @@ SMODS.Joker{
 		return { vars = { card.ability.extra.mult, card.ability.extra.mult_gain, card.ability.extra.chips, card.ability.extra.chip_gain } }
 	end,
 
-	rarity = 2,
+	rarity = 3,
 	atlas = 'MilanMod',
 	pos = { x = 1, y = 0},
-	cost = 5,
+	cost = 8,
 
 	unlocked = true,
 	discovered = true,
@@ -94,14 +94,14 @@ SMODS.Joker{
 	end
 }
 
--- Spectral Teller, change name PLS
+-- Bad Omen
 SMODS.Joker {
-	key = 'spectral_teller',
+	key = 'bad_omen',
 	loc_txt = {
-		name = 'Spectral Teller',
+		name = 'Bad Omen',
 		text = {
 			"Gains {C:white,X:mult}X#1#{} Mult per",
-			"unique Spectral card used this run",
+			"unique {C:spectral}Spectral {}card used this run",
 			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
 		}
 	},
@@ -110,6 +110,7 @@ SMODS.Joker {
 
 
 	loc_vars = function(self, info_queue, card)
+
 		local spectral_used = 0
 		for k, v in pairs(G.GAME.consumeable_usage) do if v.set == 'Spectral' then spectral_used = spectral_used + 1 end end
 		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain   } }
@@ -118,7 +119,7 @@ SMODS.Joker {
 	rarity = 3,
 	atlas = 'MilanMod',
 	pos = {x = 2, y = 0},
-	cost = 8,
+	cost = 9,
 
 	unlocked = true,
 	discovered = true,
@@ -143,8 +144,8 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Red Joker',
 		text = {
-			"Gains {C:chips}+#1# {}chips per discard",
-			"{C:inactive}(Currently {C:chips}+#2# {C:inactive}chips)"
+			"Gains {C:chips}+#1# {}Chips per {C:attention}discard{}.",
+			"{C:inactive}(Currently {C:chips}+#2# {C:inactive}Chips)"
 		}
 	},
 
@@ -188,8 +189,8 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Rigged Wheel',
 		text = {
-			"All chances Editions for additions",
-			"are equally likely, including {C:dark_edition}Negative{}."
+			"All chances for {C:enhanced}Editions {}are",
+			"equally likely, including {C:dark_edition}Negative{}."
 		}
 	},
 
@@ -211,69 +212,70 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = false,
 
-	-- TODO: fix this function for if there's multiple Rigged Wheels, cause that seems to break it????????????????????
-	add_to_deck = function(self, card, from_debuff)
-		local original_poll_edition = poll_edition --overwrite the poll_edition function
-		function poll_edition(key, mod, no_neg, guaranteed)
-			mod = mod or 1 --basically the code of the poll_edition function but i changed one number
-			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
-			if guaranteed then
-				-- ISSUE: usually picks negative over everything else, this may be
-				-- because the value is all the same, it should check for different numbers
-				if edition_poll > 1 - 0.01725*25 then
-					return {negative = true}
-				elseif edition_poll > 1 - 0.01725*25 then
-					return {polychrome = true}
-				elseif edition_poll > 1 - 0.01725*25 then
-					return {holo = true}
-				elseif edition_poll > 1 - 0.01725*25 then
-					return {foil = true}
-				end
-			else
-				if edition_poll > 1 - 0.01725*mod then
-					return {negative = true}
+	calculate = function(self, card, context)
+		if context.using_consumeable and context.consumeable.ability.name == 'The Wheel of Fortune' then
+			function poll_edition(key, mod, no_neg, guaranteed)
+				mod = mod or 1 --basically the code of the poll_edition function but i changed one number
+				local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
+				local tempval = pseudorandom(pseudoseed(key or 'edition_generic'), 1, 4)
+				if guaranteed and edition_poll > 1 - 0.01725*100 then
+					if tempval == 1 then
+						return {negative = true}
+					elseif tempval == 2 then
+						return {polychrome = true}
+					elseif tempval == 3 then
+						return {holo = true}
+					elseif tempval == 4 then
+						return {foil = true}
+					end
 				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
-					return {polychrome = true}
-				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
-					return {holo = true}
-				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
-					return {foil = true}
+					if tempval == 1 then
+						return {negative = true}
+					elseif tempval == 2 then
+						return {polychrome = true}
+					elseif tempval == 3 then
+						return {holo = true}
+					elseif tempval == 4 then
+						return {foil = true}
+					end
 				end
 			end
-			return nil
-		end
-	end,
-
-	remove_from_deck = function(self, card, from_debuff)
-		local original_poll_edition = poll_edition
-		function poll_edition(key, mod, no_neg, guaranteed)
-			mod = mod or 1
-			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
-			if guaranteed then
-				if edition_poll > 1 - 0.003*25 and not _no_neg then
-					return {negative = true}
-				elseif edition_poll > 1 - 0.006*25 then
-					return {polychrome = true}
-				elseif edition_poll > 1 - 0.02*25 then
-					return {holo = true}
-				elseif edition_poll > 1 - 0.04*25 then
-					return {foil = true}
-				end
-			else
-				if edition_poll > 1 - 0.003*mod and not _no_neg then
-					return {negative = true}
-				elseif edition_poll > 1 - 0.006*G.GAME.edition_rate*mod then
-					return {polychrome = true}
-				elseif edition_poll > 1 - 0.02*G.GAME.edition_rate*mod then
-					return {holo = true}
-				elseif edition_poll > 1 - 0.04*G.GAME.edition_rate*mod then
-					return {foil = true}
-				end
-			end
-			return nil
 		end
 	end
 
+	-- -- TODO: fix this function for if there's multiple Rigged Wheels, cause that seems to break it????????????????????
+	-- add_to_deck = function(self, card, from_debuff)
+		
+	-- end,
+
+	-- remove_from_deck = function(self, card, from_debuff)
+	-- 	function poll_edition(key, mod, no_neg, guaranteed)
+	-- 		mod = mod or 1
+	-- 		local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
+	-- 		if guaranteed then
+	-- 			if edition_poll > 1 - 0.003*25 and not _no_neg then
+	-- 				return {negative = true}
+	-- 			elseif edition_poll > 1 - 0.006*25 then
+	-- 				return {polychrome = true}
+	-- 			elseif edition_poll > 1 - 0.02*25 then
+	-- 				return {holo = true}
+	-- 			elseif edition_poll > 1 - 0.04*25 then
+	-- 				return {foil = true}
+	-- 			end
+	-- 		else
+	-- 			if edition_poll > 1 - 0.003*mod and not _no_neg then
+	-- 				return {negative = true}
+	-- 			elseif edition_poll > 1 - 0.006*G.GAME.edition_rate*mod then
+	-- 				return {polychrome = true}
+	-- 			elseif edition_poll > 1 - 0.02*G.GAME.edition_rate*mod then
+	-- 				return {holo = true}
+	-- 			elseif edition_poll > 1 - 0.04*G.GAME.edition_rate*mod then
+	-- 				return {foil = true}
+	-- 			end
+	-- 		end
+	-- 		return nil
+	-- 	end
+	-- end
 }
 
 -- Brick by brick
@@ -284,7 +286,7 @@ SMODS.Joker{
 		name = 'Brick by Brick',
 		text = {
 			"This Joker gains {C:mult}+#1# {}Mult",
-			"for each scoring Stone card.",
+			"for each scoring {C:attention}Stone {}card.",
 			"{C:inactive}(Currently {C:mult}+#2# {C:inactive}Mult)"
 		}
 	},
@@ -397,7 +399,7 @@ SMODS.Joker{
 	rarity = 2,
 	atlas = 'MilanMod',
 	pos = { x = 7, y = 0 },
-	cost = 4,
+	cost = 7,
 
 	unlocked = true,
 	discovered = true,
@@ -500,7 +502,7 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if context.other_card == context.scoring_hand[1] and context.other_card.ability.name == "Wild Card" then
+			if context.other_card == context.full_hand[1] and context.other_card.ability.name == "Wild Card" then
 				return {
 					-- TO DO: fix the position of text, blueprint says it at the joker, but wild west at the card
 					mult = card.ability.extra.mult,
