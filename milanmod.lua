@@ -188,7 +188,7 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Rigged Wheel',
 		text = {
-			"All Editions from the Wheel of Fortune",
+			"All chances Editions for additions",
 			"are equally likely, including {C:dark_edition}Negative{}."
 		}
 	},
@@ -196,9 +196,6 @@ SMODS.Joker{
 	config = { extra = {}},
 
 	loc_vars = function(self, info_queue, card)
-		-- This is the way to add an info_queue, which is extra information about other cards
-		-- like Stone Cards on Marble/Stone Jokers, Steel Cards on Steel Joker, and
-		-- in this case, information about negative editions on Perkeo.
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
 	end,
 
@@ -212,18 +209,18 @@ SMODS.Joker{
 	blueprint_compat = false,
 
 	add_to_deck = function(self, card, from_debuff)
-		local original_poll_edition = poll_edition
-		function poll_edition(key, mod, no_neg, guaranteed)
+		local original_poll_edition = poll_edition -- overwrite poll_edition
+		function poll_edition(key, mod, no_neg, guaranteed) --basically poll_edition code from common_events.lua
 			mod = mod or 1
 			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
 			if guaranteed then
-				if edition_poll > 1 - 0.003*25 then
+				if edition_poll > 1 - 0.01725*25 then
 					return {negative = true}
-				elseif edition_poll > 1 - 0.006*25 then
+				elseif edition_poll > 1 - 0.01725*25 then
 					return {polychrome = true}
-				elseif edition_poll > 1 - 0.02*25 then
+				elseif edition_poll > 1 - 0.01725*25 then
 					return {holo = true}
-				elseif edition_poll > 1 - 0.04*25 then
+				elseif edition_poll > 1 - 0.01725*25 then
 					return {foil = true}
 				end
 			else
