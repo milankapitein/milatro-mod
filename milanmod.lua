@@ -218,6 +218,8 @@ SMODS.Joker{
 			mod = mod or 1 --basically the code of the poll_edition function but i changed one number
 			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
 			if guaranteed then
+				-- ISSUE: usually picks negative over everything else, this may be
+				-- because the value is all the same, it should check for different numbers
 				if edition_poll > 1 - 0.01725*25 then
 					return {negative = true}
 				elseif edition_poll > 1 - 0.01725*25 then
@@ -401,6 +403,8 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = false,
 
+
+	-- TO DO: fix if 2 are available
 	add_to_deck = function(self, card, context)
 		-- local original_card_is_suit = Card:is_suit()
 		function Card:is_suit(suit, bypass_debuff, flush_calc)
@@ -474,14 +478,14 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Wild West',
 		text = {
-			"+{C:mult}#1# {}Mult for scoring {C:attention}Wild {}card",
+			"{C:mult}+#1# {}Mult for scoring {C:attention}Wild {}card",
 			"in the leftmost position."
 		}
 	},
 
 	config = { extra = {mult = 30}},
 
-	loc_vars = function(self, info_queue_card)
+	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.mult }}
 	end,
 
@@ -496,10 +500,10 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if context.other_card == context.scoring_hand[1] and self.ability.name == "Wild Card" then
+			if context.other_card == context.scoring_hand[1] and context.other_card.ability.name == "Wild Card" then
 			return {
 				mult = card.ability.extra.mult,
-				card = context.other_card
+				card = context.other_card,
 			}
 			end
 		end
