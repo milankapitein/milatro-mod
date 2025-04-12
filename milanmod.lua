@@ -320,7 +320,6 @@ SMODS.Joker{
 	end
 }
 
-
 -- Miner
 SMODS.Joker{
 	key = 'miner',
@@ -357,6 +356,61 @@ SMODS.Joker{
 					repetitions = card.ability.extra.repetitions,
 					card = context.self
 				}
+			end
+		end
+	end
+}
+
+-- Colorblindness
+SMODS.Joker{
+	key = 'colorblindness', 
+
+	loc_txt = {
+		name = 'Colorblindness',
+		text = "Clubs and Diamonds count",
+		"as the same suit."
+	},
+
+	config = { extra = {} },
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 7, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	add_to_deck = function(self, card, context)
+		function Card:is_suit(suit, bypass_debuff, flush_calc)
+			if flush_calc then
+				if self.ability.effect == 'Stone Card' then
+					return false
+				end
+				if self.ability.name == "Wild Card" and not self.debuff then
+					return true
+				end
+				if next(find_joker('Smeared Joker')) and (self.base.suit == 'Hearts' or self.base.suit == 'Diamonds') == (suit == 'Hearts' or suit == 'Diamonds') then
+					return true
+				end
+				if --[[ if findjoker colorblindness AND club or diamond ]] true then
+					--return true
+				end
+				-- if find joker smeared AND colorblindness -> true
+				return self.base.suit == suit
+			else
+				if self.debuff and not bypass_debuff then return end
+				if self.ability.effect == 'Stone Card' then
+					return false
+				end
+				if self.ability.name == "Wild Card" then
+					return true
+				end
+				if next(find_joker('Smeared Joker')) and (self.base.suit == 'Hearts' or self.base.suit == 'Diamonds') == (suit == 'Hearts' or suit == 'Diamonds') then
+					return true
+				end
+				return self.base.suit == suit
 			end
 		end
 	end
