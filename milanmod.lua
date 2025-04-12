@@ -196,6 +196,9 @@ SMODS.Joker{
 	config = { extra = {}},
 
 	loc_vars = function(self, info_queue, card)
+		-- This is the way to add an info_queue, which is extra information about other cards
+		-- like Stone Cards on Marble/Stone Jokers, Steel Cards on Steel Joker, and
+		-- in this case, information about negative editions on Perkeo.
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
 	end,
 
@@ -208,10 +211,11 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = false,
 
+	-- TODO: fix this function for if there's multiple Rigged Wheels, cause that seems to break it????????????????????
 	add_to_deck = function(self, card, from_debuff)
-		local original_poll_edition = poll_edition -- overwrite poll_edition
-		function poll_edition(key, mod, no_neg, guaranteed) --basically poll_edition code from common_events.lua
-			mod = mod or 1
+		local original_poll_edition = poll_edition --overwrite the poll_edition function
+		function poll_edition(key, mod, no_neg, guaranteed)
+			mod = mod or 1 --basically the code of the poll_edition function but i changed one number
 			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
 			if guaranteed then
 				if edition_poll > 1 - 0.01725*25 then
@@ -244,7 +248,7 @@ SMODS.Joker{
 			mod = mod or 1
 			local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
 			if guaranteed then
-				if edition_poll > 1 - 0.003*25 then
+				if edition_poll > 1 - 0.003*25 and not _no_neg then
 					return {negative = true}
 				elseif edition_poll > 1 - 0.006*25 then
 					return {polychrome = true}
@@ -254,7 +258,7 @@ SMODS.Joker{
 					return {foil = true}
 				end
 			else
-				if edition_poll > 1 - 0.003*mod then
+				if edition_poll > 1 - 0.003*mod and not _no_neg then
 					return {negative = true}
 				elseif edition_poll > 1 - 0.006*G.GAME.edition_rate*mod then
 					return {polychrome = true}
