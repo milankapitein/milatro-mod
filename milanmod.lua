@@ -501,10 +501,12 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
 			if context.other_card == context.scoring_hand[1] and context.other_card.ability.name == "Wild Card" then
-			return {
-				mult = card.ability.extra.mult,
-				card = context.other_card,
-			}
+				return {
+					-- TO DO: fix the position of text, blueprint says it at the joker, but wild west at the card
+					mult = card.ability.extra.mult,
+					card = context.other_card,
+					message = "YEEE-HAW!"
+				}
 			end
 		end
 	end
