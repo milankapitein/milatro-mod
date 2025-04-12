@@ -334,6 +334,10 @@ SMODS.Joker{
 
 	config = { extra = { repetitions = 1 } },
 
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.repetitions+1} }
+	end,
+
 	rarity = 1,
 	atlas = 'MilanMod',
 	pos = { x = 6, y = 0 },
@@ -347,9 +351,11 @@ SMODS.Joker{
 		if context.cardarea == G.play and context.repetition and not context.repetition_only then
 			if context.other_card:get_id() < 0 then
 				return {
-					message = 'Again!',
+					message = localize('k_again_ex'),
+					-- repetitions = card.ability.extra.repetitions,
+					-- card = context.other_card
 					repetitions = card.ability.extra.repetitions,
-					card = context.other_card
+					card = context.self
 				}
 			end
 		end
