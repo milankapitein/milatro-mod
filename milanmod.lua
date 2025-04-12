@@ -467,3 +467,41 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Wild West
+SMODS.Joker{
+	key = 'wild_west',
+	loc_txt = {
+		name = 'Wild West',
+		text = {
+			"+{C:mult}#1# {}Mult for scoring {C:attention}Wild {}card",
+			"in the leftmost position."
+		}
+	},
+
+	config = { extra = {mult = 30}},
+
+	loc_vars = function(self, info_queue_card)
+		return { vars = { card.ability.extra.mult }}
+	end,
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	cost = 5,
+	pos = {x = 8, y = 0},
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			if context.other_card == context.scoring_hand[1] and self.ability.name == "Wild Card" then
+			return {
+				mult = card.ability.extra.mult,
+				card = context.other_card
+			}
+			end
+		end
+	end
+}
