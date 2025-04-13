@@ -1,7 +1,7 @@
 {
     "id": "MilanMod",
     "name": "Milan Mod",
-    "author": ["Milan, Emilia"],
+    "author": ["Milan, Emilia, Emma"],
     "description": "Milan's cool mod that adds a bunch of jokers",
     "prefix": "mlnc",
     "main_file": "milanmod.lua",
@@ -9,5 +9,5 @@
     "dependencies": [
         "Steamodded (>=1.0.0~ALPHA-1225a)"
     ],
-    "version": "0.9.0"
+    "version": "0.10.0"
 }
