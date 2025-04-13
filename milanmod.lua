@@ -183,6 +183,38 @@ SMODS.Joker {
 }
 
 -- Rigged Wheel
+local base_poll_edition = poll_edition
+function poll_edition(key, mod, no_neg, guaranteed)
+	if (next(SMODS.find_card('j_mlnc_rigged_wheel'))) then
+		mod = mod or 1 --basically the code of the poll_edition function but i changed one number
+		local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
+		local tempval = pseudorandom(pseudoseed(key or 'edition_generic'), 1, 4)
+		if guaranteed and edition_poll > 1 - 0.01725 * 100 then
+			if tempval == 1 then
+				return { negative = true }
+			elseif tempval == 2 then
+				return { polychrome = true }
+			elseif tempval == 3 then
+				return { holo = true }
+			elseif tempval == 4 then
+				return { foil = true }
+			end
+		elseif edition_poll > 1 - 0.01725 * G.GAME.edition_rate * mod then
+			if tempval == 1 then
+				return { negative = true }
+			elseif tempval == 2 then
+				return { polychrome = true }
+			elseif tempval == 3 then
+				return { holo = true }
+			elseif tempval == 4 then
+				return { foil = true }
+			end
+		end
+	else
+		return base_poll_edition(key, mod, no_neg, guaranteed)
+	end
+end
+
 SMODS.Joker{
 	key = 'rigged_wheel',
 
@@ -210,72 +242,7 @@ SMODS.Joker{
 
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = false,
-
-	calculate = function(self, card, context)
-		if context.using_consumeable and context.consumeable.ability.name == 'The Wheel of Fortune' then
-			function poll_edition(key, mod, no_neg, guaranteed)
-				mod = mod or 1 --basically the code of the poll_edition function but i changed one number
-				local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
-				local tempval = pseudorandom(pseudoseed(key or 'edition_generic'), 1, 4)
-				if guaranteed and edition_poll > 1 - 0.01725*100 then
-					if tempval == 1 then
-						return {negative = true}
-					elseif tempval == 2 then
-						return {polychrome = true}
-					elseif tempval == 3 then
-						return {holo = true}
-					elseif tempval == 4 then
-						return {foil = true}
-					end
-				elseif edition_poll > 1 - 0.01725*G.GAME.edition_rate*mod then
-					if tempval == 1 then
-						return {negative = true}
-					elseif tempval == 2 then
-						return {polychrome = true}
-					elseif tempval == 3 then
-						return {holo = true}
-					elseif tempval == 4 then
-						return {foil = true}
-					end
-				end
-			end
-		end
-	end
-
-	-- -- TODO: fix this function for if there's multiple Rigged Wheels, cause that seems to break it????????????????????
-	-- add_to_deck = function(self, card, from_debuff)
-		
-	-- end,
-
-	-- remove_from_deck = function(self, card, from_debuff)
-	-- 	function poll_edition(key, mod, no_neg, guaranteed)
-	-- 		mod = mod or 1
-	-- 		local edition_poll = pseudorandom(pseudoseed(key or 'edition_generic'))
-	-- 		if guaranteed then
-	-- 			if edition_poll > 1 - 0.003*25 and not _no_neg then
-	-- 				return {negative = true}
-	-- 			elseif edition_poll > 1 - 0.006*25 then
-	-- 				return {polychrome = true}
-	-- 			elseif edition_poll > 1 - 0.02*25 then
-	-- 				return {holo = true}
-	-- 			elseif edition_poll > 1 - 0.04*25 then
-	-- 				return {foil = true}
-	-- 			end
-	-- 		else
-	-- 			if edition_poll > 1 - 0.003*mod and not _no_neg then
-	-- 				return {negative = true}
-	-- 			elseif edition_poll > 1 - 0.006*G.GAME.edition_rate*mod then
-	-- 				return {polychrome = true}
-	-- 			elseif edition_poll > 1 - 0.02*G.GAME.edition_rate*mod then
-	-- 				return {holo = true}
-	-- 			elseif edition_poll > 1 - 0.04*G.GAME.edition_rate*mod then
-	-- 				return {foil = true}
-	-- 			end
-	-- 		end
-	-- 		return nil
-	-- 	end
-	-- end
+	blueprint_compat = false
 }
 
 -- Brick by brick
@@ -365,7 +332,31 @@ SMODS.Joker{
 	end
 }
 
+
 -- Colorblindness
+-- inspired by https://github.com/TheOneGoofAli/TOGAPackBalatro/blob/20a4d9d2d930cb22daa22c01930aaafb67656daf/togastuff.lua#L211-L242
+local original_card_is_suit = Card.is_suit
+function Card:is_suit(suit, bypass_debuff, flush_calc)
+	if flush_calc then
+		if next(SMODS.find_card('j_mlnc_colorblindness')) and (self.base.suit == 'Clubs' or self.base.suit == 'Diamonds') == (suit == 'Clubs' or suit == 'Diamonds') then
+			return true
+		end
+		if next(SMODS.find_card('j_mlnc_colorblindness')) and next(SMODS.find_card('j_smeared')) then
+			return true
+		end
+		return original_card_is_suit(self, suit, bypass_debuff, flush_calc)
+	else
+		if self.debuff and not bypass_debuff then return end
+		if next(SMODS.find_card('j_mlnc_colorblindness')) and (self.base.suit == 'Clubs' or self.base.suit == 'Diamonds') == (suit == 'Clubs' or suit == 'Diamonds') then
+			return true
+		end
+		if next(SMODS.find_card('j_mlnc_colorblindness')) and next(SMODS.find_card('j_smeared')) then
+			return true
+		end
+		return original_card_is_suit(self, suit, bypass_debuff, flush_calc)
+	end
+end
+
 SMODS.Joker{
 	key = 'colorblindness',
 
@@ -403,75 +394,7 @@ SMODS.Joker{
 
 	unlocked = true,
 	discovered = true,
-	blueprint_compat = false,
-
-
-	-- TO DO: fix if 2 are available
-	add_to_deck = function(self, card, context)
-		-- local original_card_is_suit = Card:is_suit()
-		function Card:is_suit(suit, bypass_debuff, flush_calc)
-			if flush_calc then
-				if self.ability.effect == 'Stone Card' then
-					return false
-				end
-				if self.ability.name == "Wild Card" and not self.debuff then
-					return true
-				end
-				if  (self.base.suit == 'Clubs' or self.base.suit == 'Diamonds') == (suit == 'Clubs' or suit == 'Diamonds') then
-					return true
-				end
-				if next(find_joker('Smeared Joker')) then
-					return true
-				end
-				return self.base.suit == suit
-			else
-				if self.debuff and not bypass_debuff then return end
-				if self.ability.effect == 'Stone Card' then
-					return false
-				end
-				if self.ability.name == "Wild Card" then
-					return true
-				end
-				if (self.base.suit == 'Clubs' or self.base.suit == 'Diamonds') == (suit == 'Clubs' or suit == 'Diamonds') then
-					return true
-				end
-				if next(find_joker('Smeared Joker')) then
-					return true
-				end
-				return self.base.suit == suit
-			end
-		end
-	end,
-
-	remove_from_deck = function(self, card, context)
-		-- local original_card_is_suit = Card:is_suit()
-		function Card:is_suit(suit, bypass_debuff, flush_calc)
-			if flush_calc then
-				if self.ability.effect == 'Stone Card' then
-					return false
-				end
-				if self.ability.name == "Wild Card" and not self.debuff then
-					return true
-				end
-				if next(find_joker('Smeared Joker')) and (self.base.suit == 'Hearts' or self.base.suit == 'Diamonds') == (suit == 'Hearts' or suit == 'Diamonds') then
-					return true
-				end
-				return self.base.suit == suit
-			else
-				if self.debuff and not bypass_debuff then return end
-				if self.ability.effect == 'Stone Card' then
-					return false
-				end
-				if self.ability.name == "Wild Card" then
-					return true
-				end
-				if next(find_joker('Smeared Joker')) and (self.base.suit == 'Hearts' or self.base.suit == 'Diamonds') == (suit == 'Hearts' or suit == 'Diamonds') then
-					return true
-				end
-				return self.base.suit == suit
-			end
-		end
-	end
+	blueprint_compat = false
 }
 
 -- Wild West
