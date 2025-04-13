@@ -778,3 +778,67 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Unfortunate Kitten
+SMODS.Joker{
+	key = 'unfortunate_kitten',
+
+	loc_txt = {
+		name = 'Unfortunate Kitten',
+		text = {
+			"This Joker gains {C:white,X:mult}X#1# {} Mult if a {C:attention}Lucky {}card",
+			"{C:red}unsuccesfully {}triggers, loses {C:white,X:mult}X#2# {} Mult",
+			"for a {C:green}succesfull {}trigger",
+			"{C:inactive}(Currently {C:white,X:mult}X#3# {C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = { Xmult_gain = 0.1, Xmult_loss = 0.2, Xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult_loss, card.ability.extra.Xmult}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 5, y = 1 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				--TODO: fix x1 not displaying when lucky cards trigger and joker is at x1 mult
+				Xmult = card.ability.extra.Xmult,
+				-- message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
+			}
+		end
+		if context.individual and context.cardarea == G.play then
+			if context.other_card.ability.name == 'Lucky Card' and not context.other_card.lucky_trigger then
+				card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+				return {
+					message = '+X0.1',
+					colour = G.C.Mult,
+					card = card
+				}
+			end
+			if context.other_card.lucky_trigger then
+				if (card.ability.extra.Xmult <= 1.1) then
+					card.ability.extra.Xmult = 1
+					return { 
+						card = card
+					}
+				end
+				card.ability.extra.Xmult = (card.ability.extra.Xmult - card.ability.extra.Xmult_loss) or 1
+				return {
+					message = '-X0.2',
+					colour = G.C.Mult,
+					card = card
+				}
+			end
+		end
+	end
+}
