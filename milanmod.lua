@@ -25,7 +25,7 @@ SMODS.Joker {
 		return { vars = { card.ability.extra.Xmult } }
 	end,
 
-	rarity = 2,
+	rarity = 3,
 	atlas = 'MilanMod',
 	pos = { x = 0, y = 0 },
 	cost = 7,
@@ -51,7 +51,7 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Circle Joker',
 		text = {
-			"If hand contains {C:attention}1 {}card",
+			"If hand contains exactly {C:attention}1 {}card",
 			"this joker gains {C:mult}+#2# {}Mult",
 			"and {C:chips}+#4# {}Chips",
 			"{C:inactive}(Currently {C:mult}+#1# {C:inactive}Mult & {C:chips}+#3# {C:inactive}Chips)"
@@ -145,12 +145,12 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Red Joker',
 		text = {
-			"Gains {C:chips}+#1# {}Chips per {C:attention}discard{}.",
+			"Gains {C:chips}+#1# {}Chips per {C:attention}discard{}",
 			"{C:inactive}(Currently {C:chips}+#2# {C:inactive}Chips)"
 		}
 	},
 
-	config = { extra = { chips_gain = 15, chips = 0 } },
+	config = { extra = { chips_gain = 10, chips = 0 } },
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips_gain, card.ability.extra.chips } }
@@ -223,7 +223,7 @@ SMODS.Joker {
 		name = 'Rigged Wheel',
 		text = {
 			"All chances for {C:enhanced}Editions {}are",
-			"equally likely, including {C:dark_edition}Negative{}."
+			"equally likely, including {C:dark_edition}Negative{}"
 		}
 	},
 
@@ -254,7 +254,7 @@ SMODS.Joker {
 		name = 'Brick by Brick',
 		text = {
 			"This Joker gains {C:mult}+#1# {}Mult",
-			"for each scoring {C:attention}Stone {}card.",
+			"for each scoring {C:attention}Stone {}card",
 			"{C:inactive}(Currently {C:mult}+#2# {C:inactive}Mult)"
 		}
 	},
@@ -365,7 +365,7 @@ SMODS.Joker {
 		name = 'Colorblindness',
 		text = {
 			"{V:3}Clubs{} and {V:4}Diamonds{} count",
-			"as the same suit."
+			"as the same suit"
 		}
 	},
 
@@ -405,7 +405,7 @@ SMODS.Joker {
 		name = 'Wild West',
 		text = {
 			"{C:mult}+#1# {}Mult for scoring {C:attention}Wild {}card",
-			"in the leftmost position."
+			"in the leftmost position"
 		}
 	},
 
@@ -446,7 +446,7 @@ SMODS.Joker {
 		name = 'Fire Tornado',
 		text = {
 			"{C:mult}+#1# {}Mult if played hand only",
-			"contains {V:2}Hearts {}and {V:4}Diamonds{}."
+			"contains {V:2}Hearts {}and {V:4}Diamonds{}"
 		}
 	},
 
@@ -517,8 +517,8 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Symmetry Joker',
 		text = {
-			"{C:attention}Retrigger {}all scoring {C:attention} 8s{},",
-			"{C:attention}6s {}, {C:attention}9s {}and {C:attention}Aces {}"
+			"Retrigger all scoring {C:attention}8s{},",
+			"{C:attention}6s{}, {C:attention}9s {}and {C:attention}Aces {}"
 		}
 	},
 
@@ -557,8 +557,8 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Hole in One',
 		text = {
-			"If {C:attention}first {} of round contains",
-			"a scoring {C:attention}Ace {}, earn {C:money}$#1#{}."
+			"If {C:attention}first hand{} of round contains",
+			"a scoring {C:attention}Ace{}, earn {C:money}$#1#{}"
 		}
 	},
 
@@ -606,8 +606,8 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Slot Machine',
 		text = {
-			"If hand contains 3 {C:attention} 7s{},",
-			"create {C:attention}3 {C:dark_edition}Negative {}Consumables."
+			"If hand contains 3 {C:attention}7s{},",
+			"create {C:attention}3 {C:dark_edition}Negative {}Consumables"
 		}
 	},
 
@@ -668,7 +668,7 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'The Deal',
 		text = {
-			"Go down to {C:blue}#1#{} Hand, gain {C:red}+#2# {}Discards."
+			"Go down to {C:blue}#1#{} Hand, gain {C:red}+#2# {}Discards"
 		}
 	},
 
@@ -719,4 +719,62 @@ SMODS.Joker {
 		end
 	end
 
+}
+
+-- Loan Shark
+SMODS.Joker{
+	key = 'loan_shark',
+
+	loc_txt = {
+		name = 'Loan Shark',
+		text = {
+			"This Joker gains {C:white,X:mult}X#1# {} Mult for",
+			"each {C:money}1${} below {C:money}0{}",
+			"Go up to {C:red}-$#2#{} in debt",
+			"{C:inactive}(Currently {C:white,X:mult}X#3#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = { Xmult_gain = 0.5, debt = 5, Xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		if G.GAME.dollars < 0 then
+			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.debt, card.ability.extra.Xmult + math.abs(G.GAME.dollars) * card.ability.extra.Xmult_gain }}
+		else
+			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.debt, card.ability.extra.Xmult }}
+		end
+		
+	end,
+
+	rarity = 3,
+	atlas = 'MilanMod',
+	pos = { x = 4, y = 1 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	add_to_deck = function(self, card, from_debuff)
+		G.GAME.bankrupt_at = G.GAME.bankrupt_at - card.ability.extra.debt
+	end,
+
+	remove_from_deck = function(self, card, from_debuff)
+		G.GAME.bankrupt_at = G.GAME.bankrupt_at + card.ability.extra.debt
+	end,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local mult = 0
+			if G.GAME.dollars < 0 then
+				mult = card.ability.extra.Xmult + math.abs(G.GAME.dollars) * card.ability.extra.Xmult_gain
+			else
+				mult = card.ability.extra.Xmult
+			end
+			return {
+				Xmult_mod = mult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { mult } }
+			}
+		end
+	end
 }
