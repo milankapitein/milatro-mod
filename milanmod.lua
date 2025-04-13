@@ -436,3 +436,160 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Fire Tornado
+SMODS.Joker{
+	key = 'fire_tornado',
+
+	loc_txt = {
+		name = 'Fire Tornado',
+		text = {
+			"{C:mult}+#1# {}Mult if played hand only",
+			"contains {V:2}Hearts {}and {V:4}Diamonds{}."
+		}
+	},
+
+	config = { extra = { mult = 20} }, 
+
+	loc_vars = function(self, info_queue, card)
+		return {
+			vars = {
+				card.ability.extra.mult,
+				"Spade",
+				"Heart",
+				"Club",
+				"Diamond",
+				colours = { 
+				  G.C.SUITS.Spades,
+				  G.C.SUITS.Hearts,
+				  G.C.SUITS.Clubs,
+				  G.C.SUITS.Diamonds
+				}
+			}
+		}
+	end,
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 9, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local suits = {
+				['Hearts'] = 0,
+				['Diamonds'] = 0,
+				['Spades'] = 0,
+				['Clubs'] = 0
+			}
+			for i = 1, #context.full_hand do
+				if context.full_hand[i].ability.name ~= 'Wild Card' then
+					if context.full_hand[i]:is_suit('Hearts', true) then
+						suits["Hearts"] = suits["Hearts"] + 1
+					elseif context.full_hand[i]:is_suit('Diamonds', true) then
+						suits["Diamonds"] = suits["Diamonds"] + 1
+					elseif context.full_hand[i]:is_suit('Spades', true) then
+						suits["Spades"] = suits["Spades"] + 1
+					elseif context.full_hand[i]:is_suit('Clubs', true) then
+						suits["Clubs"] = suits["Clubs"] + 1
+					end
+				end
+			end
+			if suits["Clubs"] <= 0 and suits["Spades"] <= 0 then
+				return {
+					mult = card.ability.extra.mult,
+				}
+			end
+		end
+	end
+
+}
+
+-- Symmetry Joker
+SMODS.Joker{
+	key = 'symmertry_joker',
+
+	loc_txt = {
+		name = 'Symmetry Joker',
+		text = {
+			"{C:attention}Retrigger {}all scoring {C:attention} 8s{},",
+			"{C:attention}3s {} and {C:attention}Aces {}"
+		}
+	},
+
+	config = { extra = { repetitions = 1 } },
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.repetitions+1} }
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 0, y = 1 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.cardarea == G.play and context.repetition and not context.repetition_only then
+			if context.other_card:get_id() == 3 or context.other_card:get_id() == 8 or context.other_card:get_id() == 14 then
+				return {
+					message = localize('k_again_ex'),
+					repetitions = card.ability.extra.repetitions,
+					card = context.self
+				}
+			end
+		end
+	end
+}
+
+-- Hole in One
+SMODS.Joker{
+	key = 'hole_in_one',
+
+	loc_txt = {
+		name = 'Hole in One',
+		text = {
+			"If {C:attention}first {} of round contains",
+			"a scoring {C:attention}Ace {}, earn {C:money}$#1#{}."
+		}
+	},
+
+	config = { extra = { dollar = 5} },
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.dollar }}
+	end,
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 1, y = 1 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			if G.GAME.current_round.hands_played == 0 then
+				for i = 1, #context.full_hand do
+					if context.full_hand[i]:get_id() == 14 then
+						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollar
+						G.E_MANAGER:add_event(Event({ func = (function() G.GAME.dollar_buffer = 0; return true end) }))
+						return {
+							dollars = card.ability.extra.dollar,
+							colour = G.C.MONEY
+						}
+					end
+				end
+			end
+		end
+	end
+}
