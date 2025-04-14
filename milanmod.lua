@@ -801,7 +801,7 @@ SMODS.Joker{
 
 	rarity = 2,
 	atlas = 'MilanMod',
-	pos = { x = 5, y = 1 },
+	pos = { x = 4, y = 1 },
 	cost = 4,
 
 	unlocked = true,
@@ -811,7 +811,7 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				--TODO: fix x1 not displaying when lucky cards trigger and joker is at x1 mult
+				--TODO: fix x1 not displaying when lucky cards trigger and joker is at x1 mult q
 				Xmult = card.ability.extra.Xmult,
 				-- message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
 			}
@@ -838,6 +838,112 @@ SMODS.Joker{
 					colour = G.C.Mult,
 					card = card
 				}
+			end
+		end
+	end
+}
+
+-- Lumberjack
+SMODS.Joker{
+	key = 'lumberjack',
+
+	loc_txt = {
+		name = 'Lumberjack',
+		text = {
+			"Sell this Joker to remove",
+			"all {C:attention}3s {}from full deck",
+			"Earn {C:money}$#2# {} for each {C:attention}3 {}destroyed",
+			"{C:inactive}(Currently {C:attention}#1# {C:inactive}cards to remove)"
+		}
+	},
+
+	config = { extra = { three_count = 0, dollars = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		card.ability.extra.three_count = 0
+		if G.STAGE == G.STAGES.RUN then
+			for k, v in pairs(G.playing_cards) do
+				if v:get_id() == 3 then
+					card.ability.extra.three_count = card.ability.extra.three_count + 1
+				end
+			end
+		end
+		return { vars = { card.ability.extra.three_count, card.ability.extra.dollars }}
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 4, y = 1 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.selling_self then
+			local destroyed_cards = {}
+			for k, v in pairs(G.playing_cards) do
+                if v:get_id() == 3 then 
+					destroyed_cards[#destroyed_cards+1] = v
+				end
+			end
+			local no_destroyed_cards = #destroyed_cards
+			for i = 1, #destroyed_cards do
+				destroyed_cards[i]:remove()
+			end
+			G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars * no_destroyed_cards
+			G.E_MANAGER:add_event(Event({
+				func = (function()
+					G.GAME.dollar_buffer = 0; return true
+				end)
+			}))
+			return {
+				dollars = card.ability.extra.dollars * no_destroyed_cards,
+				colour = G.C.MONEY
+			}
+		end
+	end
+}
+
+-- Clown Fiesta
+SMODS.Joker{
+	key = 'clown_fiesta',
+
+	loc_txt = {
+		name = 'Clown Fiesta',
+		text = {
+			"Sell this Joker to create {C:attention}#1#{}",
+			"free {C:attention}Juggle Tags{}"
+		}
+	},
+
+	config = { extra = {tags = 2} },
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.tags }}
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 4, y = 1 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.selling_self then
+			for i = 1, card.ability.extra.tags do
+				G.E_MANAGER:add_event(Event({
+					func = (function()
+						add_tag(Tag('tag_juggle'))
+						play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+						play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+						return true
+					end)
+				}))	
 			end
 		end
 	end
