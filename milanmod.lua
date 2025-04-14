@@ -779,12 +779,54 @@ SMODS.Joker{
 	end
 }
 
--- Unfortunate Kitten
+-- The Reaper
+local last_hand
 SMODS.Joker{
-	key = 'unfortunate_kitten',
+	key = 'the_reaper',
 
 	loc_txt = {
-		name = 'Unfortunate Kitten',
+		name = 'The Reaper',
+		text = {
+			"If the {C:attention}winning hand{} of round contains",
+			"a {C:attention}Pair{}, create a {C:tarot}Death Tarot{} card"
+		}
+	},
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 5, y = 1 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.before then
+			last_hand = next(context.poker_hands['Pair'])
+		end
+		if context.end_of_round and not context.individual and not context.repetition and last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards then
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_death')
+					card:add_to_deck()
+					G.consumeables:emplace(card)
+					return true
+				end
+			}))
+			return{
+				message = 'Death comes...'
+			}
+		end
+	end
+}
+
+-- Black Kitten
+SMODS.Joker{
+	key = 'black_kitten',
+
+	loc_txt = {
+		name = 'Black Kitten',
 		text = {
 			"This Joker gains {C:white,X:mult}X#1# {} Mult if a {C:attention}Lucky {}card",
 			"{C:red}unsuccesfully {}triggers, loses {C:white,X:mult}X#2# {} Mult",
@@ -801,7 +843,7 @@ SMODS.Joker{
 
 	rarity = 2,
 	atlas = 'MilanMod',
-	pos = { x = 4, y = 1 },
+	pos = { x = 6, y = 1 },
 	cost = 4,
 
 	unlocked = true,
@@ -816,7 +858,7 @@ SMODS.Joker{
 				-- message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
 			}
 		end
-		if context.individual and context.cardarea == G.play then
+		if context.individual and context.cardarea == G.play and not context.blueprint then
 			if context.other_card.ability.name == 'Lucky Card' and not context.other_card.lucky_trigger then
 				card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
 				return {
@@ -873,7 +915,7 @@ SMODS.Joker{
 
 	rarity = 2,
 	atlas = 'MilanMod',
-	pos = { x = 4, y = 1 },
+	pos = { x = 7, y = 1 },
 	cost = 6,
 
 	unlocked = true,
@@ -926,7 +968,7 @@ SMODS.Joker{
 
 	rarity = 2,
 	atlas = 'MilanMod',
-	pos = { x = 4, y = 1 },
+	pos = { x = 8, y = 1 },
 	cost = 6,
 
 	unlocked = true,
@@ -948,3 +990,171 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Insane Joker
+SMODS.Joker{
+	key = 'insane_joker',
+
+	loc_txt = {
+		name = 'Insane Joker',
+		text = {
+			"Gains {C:white,X:mult}X#1#{} Mult for every",
+			"{C:attention}Wild 7 {}in your {C:attention}full deck{}",
+			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = { Xmult_gain = 1, Xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		card.ability.extra.Xmult = 1
+		if G.STAGE == G.STAGES.RUN then
+			for k, v in pairs(G.playing_cards) do
+				if v:get_id() == 7 and v.ability.name == "Wild Card" then
+					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+				end
+			end
+		end
+		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 9, y = 1 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				Xmult = card.ability.extra.Xmult
+			}
+		end
+	end
+}
+
+-- Thriving Joker
+SMODS.Joker{
+	key = 'thriving_joker',
+
+	loc_txt = {
+		name = 'Thriving Joker',
+		text = {
+			"{C:mult}+#1# {}Mult if played hand is ",
+			"not {C:attention}final hand{} of round"
+		}
+	},
+
+	config = {extra = {mult = 6}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.mult}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 0, y = 2 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			if G.GAME.current_round.hands_left ~= 0 then
+				return {
+					mult = card.ability.extra.mult
+				}
+			end
+		end
+	end
+}
+
+-- The Toilet
+SMODS.Joker{
+	key = 'the_toilet',
+
+	loc_txt = {
+		name = 'The Toilet',
+		text = {
+			"{C:green}#1# in #2#{} chance to upgrade level",
+			"of {C:attention}poker hand {}containing {C:attention}Flush{}"
+		}
+	},
+
+	config = { extra = { min = 1, odds = 2}},
+
+	loc_vars = function(self, info_queue, card)
+		card.ability.extra.min = (G.GAME and G.GAME.probabilities.normal or 1)
+		return { vars = {card.ability.extra.min, card.ability.extra.odds}}
+	end,
+
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 1, y = 2 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.cardarea == G.jokers and context.before then
+			if pseudorandom('toilet') < G.GAME.probabilities.normal/card.ability.extra.odds then
+				local random_hand = pseudorandom('flush_hand', 1, 4)
+				local flush_hand = ""
+				if random_hand == 1 then flush_hand = G.handlist[1] elseif random_hand == 2 then flush_hand = G.handlist[2] elseif random_hand == 3 then flush_hand = G.handlist[4] else flush_hand = G.handlist[7] end
+				update_hand_text({sound = 'button', volume = 0.7, pitch = 0.8, delay = 0.3}, {handname=localize(flush_hand, 'poker_hands'),chips = G.GAME.hands[flush_hand].chips, mult = G.GAME.hands[flush_hand].mult, level=G.GAME.hands[flush_hand].level})
+				level_up_hand(context.blueprint_card or card, flush_hand, nil, 1)
+				update_hand_text({sound = 'button', volume = 0.7, pitch = 1.1, delay = 0}, {handname=localize(context.scoring_name, 'poker_hands'),chips = G.GAME.hands[context.scoring_name].chips, mult = G.GAME.hands[context.scoring_name].mult, level=G.GAME.hands[context.scoring_name].level})
+			end
+		end
+	end
+}
+
+-- -- Magic Hat
+-- SMODS.Joker{
+-- 	key = 'key',
+
+-- 	loc_txt = {
+-- 		name = 'name',
+-- 		text = {
+-- 			"desc"
+-- 		}
+-- 	},
+
+-- 	rarity = 1,
+-- 	atlas = 'MilanMod',
+-- 	pos = { x = 2, y = 2 },
+-- 	cost = 4,
+
+-- 	unlocked = true,
+-- 	discovered = true,
+-- 	blueprint_compat = blueprint,
+-- }
+
+-- -- The Mask
+-- SMODS.Joker{
+-- 	key = 'key2',
+
+-- 	loc_txt = {
+-- 		name = 'name',
+-- 		text = {
+-- 			"desc"
+-- 		}
+-- 	},
+
+-- 	rarity = 1,
+-- 	atlas = 'MilanMod',
+-- 	pos = { x = 3, y = 2 },
+-- 	cost = 4,
+
+-- 	unlocked = true,
+-- 	discovered = true,
+-- 	blueprint_compat = false,
+-- }
