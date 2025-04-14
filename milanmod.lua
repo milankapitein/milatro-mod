@@ -1307,7 +1307,7 @@ SMODS.Joker{
 		name = 'The Legend of Jimbo',
 		text = {
 			"This Joker gains {C:white,X:mult}X#1#{} Mult",
-			"for each {E:2,T:j_joker,UI:text_dark}Jimbo {}in your Joker slots",
+			"for each {E:2,T:j_joker}Jimbo {}in your Joker slots",
 			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
 		}
 	},
@@ -1330,7 +1330,6 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
-			info_queue[#info_queue + 1] = G.P_CENTERS.text_dark
 			local jimbos = SMODS.find_card('j_joker')
 			return {
 				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
