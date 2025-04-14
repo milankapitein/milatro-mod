@@ -1097,7 +1097,7 @@ SMODS.Joker{
 	rarity = 1,
 	atlas = 'MilanMod',
 	pos = { x = 1, y = 2 },
-	cost = 4,
+	cost = 5,
 
 	unlocked = true,
 	discovered = true,
@@ -1117,44 +1117,96 @@ SMODS.Joker{
 	end
 }
 
--- -- Magic Hat
--- SMODS.Joker{
--- 	key = 'key',
+-- Magic Hat
+SMODS.Joker{
+	key = 'magic_hat',
 
--- 	loc_txt = {
--- 		name = 'name',
--- 		text = {
--- 			"desc"
--- 		}
--- 	},
+	loc_txt = {
+		name = 'Magic Hat',
+		text = {
+			"Blue and purple {C:attention}seals {}",
+			"can activate when played"
+		}
+	},
 
--- 	rarity = 1,
--- 	atlas = 'MilanMod',
--- 	pos = { x = 2, y = 2 },
--- 	cost = 4,
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 2, y = 2 },
+	cost = 5,
 
--- 	unlocked = true,
--- 	discovered = true,
--- 	blueprint_compat = blueprint,
--- }
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
 
--- -- The Mask
--- SMODS.Joker{
--- 	key = 'key2',
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+			local card_type = 'Planet'
+			G.E_MANAGER:add_event(Event({
+				func = (function()
+					if G.GAME.last_hand_played then
+						local _planet = 0
+						for k, v in pairs(G.P_CENTER_POOLS.Planet) do
+							if v.config.hand_type == G.GAME.last_hand_played then
+								_planet = v.key
+							end
+						end
+						local card = create_card(card_type,G.consumeables, nil, nil, nil, nil, _planet, 'blusl')
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+					end
+					return true
+				end)}))
+		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+            G.E_MANAGER:add_event(Event({
+                func = (function()
+                        local card = create_card('Tarot',G.consumeables, nil, nil, nil, nil, nil, '8ba')
+                        card:add_to_deck()
+                        G.consumeables:emplace(card)
+                    return true
+                end)}))
+		end
+	end
+}
 
--- 	loc_txt = {
--- 		name = 'name',
--- 		text = {
--- 			"desc"
--- 		}
--- 	},
+-- The Mask
+function Card:set_debuff(should_debuff)
+	if(self:is_face() and next(SMODS.find_card('j_mlnc_the_mask'))) then
+		self.debuff = false
+		return
+	end
 
--- 	rarity = 1,
--- 	atlas = 'MilanMod',
--- 	pos = { x = 3, y = 2 },
--- 	cost = 4,
+	-- code for original Card:set_debuff function. reference did not work so i copied it
+	if self.ability.perishable and self.ability.perish_tally <= 0 then 
+        if not self.debuff then
+            self.debuff = true
+            if self.area == G.jokers then self:remove_from_deck(true) end
+        end
+        return
+    end
+    if should_debuff ~= self.debuff then
+        if self.area == G.jokers then if should_debuff then self:remove_from_deck(true) else self:add_to_deck(true) end end
+        self.debuff = should_debuff
+    end
+end
+SMODS.Joker{
+	key = 'the_mask',
 
--- 	unlocked = true,
--- 	discovered = true,
--- 	blueprint_compat = false,
--- }
+	loc_txt = {
+		name = 'The Mask',
+		text = {
+			"{C:attention}Face {}cards can",
+			"no longer be {C:attention}debuffed{}"
+		}
+	},
+
+	rarity = 1,
+	atlas = 'MilanMod',
+	pos = { x = 3, y = 2 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+}
+
+-- 
