@@ -215,7 +215,6 @@ function poll_edition(key, mod, no_neg, guaranteed)
 		return base_poll_edition(key, mod, no_neg, guaranteed)
 	end
 end
-
 SMODS.Joker {
 	key = 'rigged_wheel',
 
@@ -357,7 +356,6 @@ function Card:is_suit(suit, bypass_debuff, flush_calc)
 		return original_card_is_suit(self, suit, bypass_debuff, flush_calc)
 	end
 end
-
 SMODS.Joker {
 	key = 'colorblindness',
 
@@ -1081,7 +1079,7 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'The Toilet',
 		text = {
-			"{C:green}#1# in #2#{} chance to upgrade level",
+			"{C:green,E:1}#1# in #2#{} chance to upgrade level",
 			"of {C:attention}poker hand {}containing {C:attention}Flush{}"
 		}
 	},
@@ -1209,4 +1207,135 @@ SMODS.Joker{
 	blueprint_compat = false,
 }
 
--- 
+-- Betrayal
+SMODS.Joker{
+	key = 'betrayal',
+
+	loc_txt = {
+		name = 'Betrayal',
+		text = {
+			"When {C:attention}Blind {}is selected, earn",
+			"{C:money}$#1# {}and {C:red}destroy {}a random Joker"
+		}
+	},
+
+	config = { extra = { dollars = 20 }},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.dollars }}
+	end,
+
+	rarity = 2,
+	atlas = 'MilanMod',
+	pos = { x = 4, y = 2 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	calculate = function(self, card, context)
+		if context.setting_blind and not context.blueprint then
+			local destructable_jokers = {}
+			for i = 1, #G.jokers.cards do
+				if G.jokers.cards[i] ~= self and not G.jokers.cards[i].ability.eternal and not G.jokers.cards[i].getting_sliced then destructable_jokers[#destructable_jokers+1] = G.jokers.cards[i] end
+			end
+			local joker_to_destroy = #destructable_jokers > 0 and pseudorandom_element(destructable_jokers, pseudoseed('madness')) or nil
+
+			if joker_to_destroy and not (context.blueprint_card or self).getting_sliced then 
+				joker_to_destroy.getting_sliced = true
+				G.E_MANAGER:add_event(Event({func = function()
+					joker_to_destroy:start_dissolve({G.C.RED}, nil, 1.6)
+				return true end }))
+			end
+			G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+			G.E_MANAGER:add_event(Event({
+				func = (function()
+					G.GAME.dollar_buffer = 0; return true
+				end)
+			}))
+			return {
+				dollars = card.ability.extra.dollars,
+				colour = G.C.MONEY
+			}
+		end
+	end
+}
+
+-- The Landlords
+SMODS.Joker{
+	key = 'the_landlords',
+
+	loc_txt = {
+		name = 'The Landlords',
+		text = {
+			"{C:white,X:mult}X#1#{} Mult if played hand",
+			"contains a {C:attention}Full House{}"
+		}
+	},
+
+	config = { extra = {Xmult = 3.5}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.Xmult }}
+	end,
+
+	rarity = 3,
+	atlas = 'MilanMod',
+	pos = { x = 5, y = 2 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main and next(context.poker_hands['Full House']) then
+			return {
+				Xmult_mod = card.ability.extra.Xmult,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
+			}
+		end
+	end
+}
+
+-- The Legend of Jimbo 
+SMODS.Joker{
+	key = 'the_legend_of_jimbo',
+
+	loc_txt = {
+		name = 'The Legend of Jimbo',
+		text = {
+			"This Joker gains {C:white,X:mult}X#1#{} Mult",
+			"for each {E:2,T:j_joker,UI:text_dark}Jimbo {}in your Joker slots",
+			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = {extra = {Xmult_gain = 10, Xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		local jimbos = SMODS.find_card('j_joker')
+		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilanMod',
+	pos = { x = 6, y = 2 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			info_queue[#info_queue + 1] = G.P_CENTERS.text_dark
+			local jimbos = SMODS.find_card('j_joker')
+			return {
+				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain } }
+			}	
+		end
+	end
+}
