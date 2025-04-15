@@ -1035,22 +1035,23 @@ SMODS.Joker{
 	end
 }
 
--- Thriving Joker
+-- Swiss Army Joker
 SMODS.Joker{
-	key = 'thriving_joker',
+	key = 'swiss_army_joker',
 
 	loc_txt = {
-		name = 'Thriving Joker',
+		name = 'Swiss Army Joker',
 		text = {
-			"{C:mult}+#1# {}Mult if played hand is ",
-			"not {C:attention}final hand{} of round"
+			"{C:mult}+#1# {}Mult on {C:attention}even{} hands",
+			"{C:chips}+#2# {}Chips on {C:attention}odd{} hands",
+			"{C:gold}$#3#{} on {C:attention}final{} hand of round"
 		}
 	},
 
-	config = {extra = {mult = 6}},
+	config = {extra = {mult = 5, chips = 60, dollars = 2}},
 
 	loc_vars = function(self, info_queue, card)
-		return { vars = {card.ability.extra.mult}}
+		return { vars = {card.ability.extra.mult, card.ability.extra.chips, card.ability.extra.dollars}}
 	end,
 
 	rarity = 1,
@@ -1064,9 +1065,25 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
-			if G.GAME.current_round.hands_left ~= 0 then
+			local round_hand_played_on = G.GAME.current_round.hands_left + 1
+			if round_hand_played_on == 1 then
+				G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+			G.E_MANAGER:add_event(Event({
+				func = (function()
+					G.GAME.dollar_buffer = 0; return true
+				end)
+			}))
+			return {
+				dollars = card.ability.extra.dollars,
+				colour = G.C.MONEY
+			}
+			elseif round_hand_played_on % 2 == 0 then
 				return {
 					mult = card.ability.extra.mult
+				}
+			else
+				return {
+					chips = card.ability.extra.chips
 				}
 			end
 		end
