@@ -1287,9 +1287,9 @@ SMODS.Joker{
 		if context.setting_blind and not context.blueprint then
 			local destructable_jokers = {}
 			for i = 1, #G.jokers.cards do
-				if G.jokers.cards[i] ~= self and not G.jokers.cards[i].ability.eternal and not G.jokers.cards[i].getting_sliced then destructable_jokers[#destructable_jokers+1] = G.jokers.cards[i] end
+				if G.jokers.cards[i] ~= card and not G.jokers.cards[i].ability.eternal and not G.jokers.cards[i].getting_sliced then destructable_jokers[#destructable_jokers+1] = G.jokers.cards[i] end
 			end
-			local joker_to_destroy = #destructable_jokers > 0 and pseudorandom_element(destructable_jokers, pseudoseed('madness')) or nil
+			local joker_to_destroy = #destructable_jokers > 0 and pseudorandom_element(destructable_jokers, pseudoseed('betrayal')) or nil
 
 			if joker_to_destroy and not (context.blueprint_card or self).getting_sliced then 
 				joker_to_destroy.getting_sliced = true
@@ -1304,6 +1304,7 @@ SMODS.Joker{
 				end)
 			}))
 			return {
+				message = tostring(#destructable_jokers),
 				dollars = card.ability.extra.dollars,
 				colour = G.C.MONEY
 			}
