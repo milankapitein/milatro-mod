@@ -1,5 +1,5 @@
 # Milan Mod
-A silly balatro mod. Currently has 22 jokers.
+A silly balatro mod. Currently has 27 jokers, with 3 more coming soon.
 
 # How to Install
 - Step 1: Install [Steamodded](https://github.com/Steamodded/smods/wiki)
