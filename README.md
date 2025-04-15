@@ -1,17 +1,17 @@
-# Milan Mod
-A silly balatro mod. Currently has 27 jokers, with 3 more coming soon.
+# Milatro Balatro Mod
+A silly little balatro mod. Currently has 28 jokers, with 2 more coming soon.
 
 # How to Install
 - Step 1: Install [Steamodded](https://github.com/Steamodded/smods/wiki)
 - Step 2: Download or clone this repository
-- Step 3: Put the ``milan_mod`` folder into your mods folder. Make sure the repository looks like the following
+- Step 3: Put the ``milatro`` folder into your mods folder. Make sure the repository looks like the following
 ```
 -- Mods
     -- Steamodded
-    -- milan-mod
+    -- milatro
         -- assets
-        -- milanmod.json
-        -- milanmod.lua
+        -- milatro.json
+        -- milatro.lua
 ```
 
 # Contact & Credits

@@ -1,8 +1,8 @@
 SMODS.Atlas {
 	-- Key for code to find it with
-	key = "MilanMod",
+	key = "MilatroMod",
 	-- The name of the file, for the code to pull the atlas from
-	path = "MilanJokers.png",
+	path = "MilatroJokers.png",
 	-- Width of each sprite in 1x size
 	px = 71,
 	-- Height of each sprite in 1x size
@@ -26,7 +26,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 0, y = 0 },
 	cost = 7,
 
@@ -64,7 +64,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 1, y = 0 },
 	cost = 8,
 
@@ -118,7 +118,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 2, y = 0 },
 	cost = 9,
 
@@ -157,7 +157,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 3, y = 0 },
 	cost = 5,
 
@@ -236,7 +236,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 4, y = 0 },
 	cost = 4,
 
@@ -265,7 +265,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 5, y = 0 },
 	cost = 5,
 
@@ -309,7 +309,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 6, y = 0 },
 	cost = 4,
 
@@ -387,7 +387,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 7, y = 0 },
 	cost = 7,
 
@@ -414,7 +414,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	cost = 5,
 	pos = { x = 8, y = 0 },
 
@@ -469,7 +469,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 9, y = 0 },
 	cost = 4,
 
@@ -527,7 +527,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 0, y = 1 },
 	cost = 6,
 
@@ -567,7 +567,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 1, y = 1 },
 	cost = 5,
 
@@ -613,7 +613,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 2, y = 1 },
 	cost = 7,
 
@@ -677,7 +677,7 @@ SMODS.Joker {
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 3, y = 1 },
 	cost = 6,
 
@@ -745,7 +745,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 4, y = 1 },
 	cost = 8,
 
@@ -792,7 +792,7 @@ SMODS.Joker{
 	},
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 5, y = 1 },
 	cost = 5,
 
@@ -841,7 +841,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 6, y = 1 },
 	cost = 4,
 
@@ -913,7 +913,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 7, y = 1 },
 	cost = 6,
 
@@ -966,7 +966,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 8, y = 1 },
 	cost = 6,
 
@@ -1018,7 +1018,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 9, y = 1 },
 	cost = 7,
 
@@ -1055,7 +1055,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 0, y = 2 },
 	cost = 4,
 
@@ -1111,7 +1111,7 @@ SMODS.Joker{
 
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 1, y = 2 },
 	cost = 5,
 
@@ -1146,7 +1146,7 @@ SMODS.Joker{
 	},
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 2, y = 2 },
 	cost = 5,
 
@@ -1246,7 +1246,7 @@ SMODS.Joker{
 	},
 
 	rarity = 1,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 3, y = 2 },
 	cost = 5,
 
@@ -1275,7 +1275,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 2,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 4, y = 2 },
 	cost = 4,
 
@@ -1331,7 +1331,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 5, y = 2 },
 	cost = 8,
 
@@ -1370,7 +1370,7 @@ SMODS.Joker{
 	end,
 
 	rarity = 3,
-	atlas = 'MilanMod',
+	atlas = 'MilatroMod',
 	pos = { x = 6, y = 2 },
 	cost = 8,
 
@@ -1385,6 +1385,53 @@ SMODS.Joker{
 				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
 				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain } }
 			}	
+		end
+	end
+}
+
+-- Rolling Boulder
+SMODS.Joker{
+	key = 'rolling_boulder',
+
+	loc_txt = {
+		name = 'Rolling Boulder',
+		text = {
+			"{C:mult}+#1# {}Mult per hand played",
+			"{C:mult}-#2# {}Mult after defeating {C:attention}Boss Blind{}",
+			"{C:inactive}(Currently {C:mult}+#3#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = { mult_gain = 5, mult_loss = 25, mult = 0}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_loss, card.ability.extra.mult}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 7, y = 2 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				mult = card.ability.extra.mult
+			}
+		end
+		if context.before and not context.blueprint then
+			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
+		end
+		if context.end_of_round and G.GAME.blind.boss and not context.blueprint and not context.repetition and not context.individual then
+			card.ability.extra.mult = card.ability.extra.mult - card.ability.extra.mult_loss
+			if card.ability.extra.mult < 0 then card.ability.extra.mult = 0 end
+			return {
+				message = "Falling..."
+			}
 		end
 	end
 }

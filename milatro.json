@@ -1,13 +1,13 @@
 {
-    "id": "MilanMod",
-    "name": "Milan Mod",
+    "id": "MilatroMod",
+    "name": "Milatro",
     "author": ["Milan, Emilia, Emma"],
     "description": "Milan's cool mod that adds a bunch of jokers",
     "prefix": "mlnc",
-    "main_file": "milanmod.lua",
+    "main_file": "milatro.lua",
     "badge_colour": "008000",
     "dependencies": [
         "Steamodded (>=1.0.0~ALPHA-1225a)"
     ],
-    "version": "0.14.4"
+    "version": "0.15.0"
 }
