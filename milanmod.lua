@@ -778,6 +778,7 @@ SMODS.Joker{
 }
 
 -- The Reaper
+-- TODO: fix if hand contains 2 blue seals, it will add a reaper and 2 planets, even with 2 slots only
 local last_hand
 SMODS.Joker{
 	key = 'the_reaper',
@@ -1166,11 +1167,40 @@ SMODS.Joker{
 	end
 }
 
--- The Mask
+-- TODO: maybe change name and effect to protect card with highest frequency
+-- The Shield
 function Card:set_debuff(should_debuff)
-	if(self:is_face() and next(SMODS.find_card('j_mlnc_the_mask'))) then
-		self.debuff = false
-		return
+	if(next(SMODS.find_card('j_mlnc_the_shield'))) then
+		local freq_ranks = {
+			[2] = 0,
+			[3] = 0,
+			[4] = 0,
+			[5] = 0,
+			[6] = 0,
+			[7] = 0,
+			[8] = 0,
+			[9] = 0,
+			[10] = 0,
+			[11] = 0,
+			[12] = 0,
+			[13] = 0,
+			[14] = 0,
+		}
+		for k, v in pairs(G.playing_cards) do
+			if v:get_id() > 0 then
+				freq_ranks[v:get_id()] = freq_ranks[v:get_id()] + 1
+			end
+		end
+		local highestFreq = 14
+		for i = 14, 2, -1 do
+			if freq_ranks[i] > freq_ranks[highestFreq] then
+				highestFreq = i
+			end
+		end
+		if self:get_id() == highestFreq then
+			self.debuff = false
+			return
+		end
 	end
 
 	-- code for original Card:set_debuff function. reference did not work so i copied it
@@ -1187,12 +1217,13 @@ function Card:set_debuff(should_debuff)
     end
 end
 SMODS.Joker{
-	key = 'the_mask',
+	key = 'the_shield',
 
 	loc_txt = {
-		name = 'The Mask',
+		name = 'The Shield',
 		text = {
-			"{C:attention}Face {}cards can",
+			"The {C:attention}card {}with highest frequency",
+			"in your entire deck can",
 			"no longer be {C:attention}debuffed{}"
 		}
 	},
@@ -1207,6 +1238,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 }
 
+--TODO: make it no longer be able to kill itself :)
 -- Betrayal
 SMODS.Joker{
 	key = 'betrayal',
