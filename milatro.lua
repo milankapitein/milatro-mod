@@ -424,7 +424,7 @@ SMODS.Joker {
 
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			if context.other_card == context.full_hand[1] and context.other_card.ability.name == "Wild Card" then
+			if context.other_card == context.full_hand[1] and context.other_card.config.center.key == "m_wild" then
 				return {
 					-- TODO: fix the position of text, blueprint says it at the joker, but wild west at the card
 					mult = card.ability.extra.mult,
@@ -1035,6 +1035,7 @@ SMODS.Joker{
 	end
 }
 
+-- TO DO: rename to Multitasking
 -- Swiss Army Joker
 SMODS.Joker{
 	key = 'swiss_army_joker',
@@ -1411,7 +1412,7 @@ SMODS.Joker{
 	rarity = 2,
 	atlas = 'MilatroMod',
 	pos = { x = 7, y = 2 },
-	cost = 4,
+	cost = 7,
 
 	unlocked = true,
 	discovered = true,
@@ -1435,3 +1436,127 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Butterfly Effect
+--TODO: find a list of all enhancements, in case of a mod adding enhanced
+local enhancements_list = {
+	"Lucky Card",
+	"Glass Card",
+	"Mult Card",
+	"Bonus Card",
+	"Stone Card",
+	-- "Steel Card",
+	-- "Gold Card",
+}
+
+local igo = Game.init_game_object
+function Game:init_game_object()
+	local ret = igo(self)
+	ret.current_round.butterfly_card = { enhancement = enhancements_list[1]}
+	return ret
+end
+
+function SMODS.current_mod.reset_game_globals(run_start)
+	G.GAME.current_round.butterfly_card = { enhancement = enhancements_list[1] }
+	local butterfly_card = pseudorandom("butterfly", 1, #enhancements_list)
+	G.GAME.current_round.butterfly_card.enhancement = enhancements_list[butterfly_card]
+end
+
+SMODS.Joker{
+	key = 'butterfly_effect',
+
+	loc_txt = {
+		name = 'Butterfly Effect',
+		text = {
+			"{C:attention}Wild Cards{} have the additional effect of {C:attention}#1#{}",
+			"Enhancement changes at the end of each round"
+		}
+	},
+
+	config = { vars = { enhancement = ""} },
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { G.GAME.current_round.butterfly_card.enhancement}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 8, y = 2 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	calculate = function(self, card, context) 
+		if context.end_of_round and not context.blueprint and not context.repetition and not context.individual then
+			return {
+				message = "Reset!"
+			}
+		end
+		--[[
+		TODO:
+		The code snippet below works when using the latest dev build (at the time 1.0.0~BETA-0416b-STEAMODDED)
+		However, this does not work on the latest release of Steamodded (1.0.0~BETA-0323b-STEAMODDED) 
+		The used code is bad and will be replaced once Steamodded is updated
+		This snippet got inspired by https://github.com/GuilloryCraft/ExtraCredit/blob/main/src/essay.lua
+		--]]
+
+		-- if context.check_enhancement then
+        --     if context.other_card.config.center.key == "m_wild" then
+        --         return {m_mult = true}
+        --     end
+        -- end
+
+		--TODO: add effects
+		if context.individual and context.cardarea == G.play and not context.blueprint then
+			if context.other_card.ability.name == "Wild Card" then
+				-- TO DO: make this code work better by not hard coding effect
+				if G.GAME.current_round.butterfly_card.enhancement == "Lucky Card" then
+					local mult = 0
+					local money = 0
+					if pseudorandom('lucky_mult') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
+						mult = 5
+					end
+					if pseudorandom('lucky_money') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
+						money = true
+						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+						G.E_MANAGER:add_event(Event({
+							func = (function()
+								G.GAME.dollar_buffer = 0; return true
+							end)
+						}))
+					end
+					return {
+						mult_mod = mult,
+						dollars = 0,
+						colour = G.C.MONEY
+					}
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Glass Card" then
+					return {
+						Xmult_mod = 2,
+						card = context.other_card
+					}
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Mult Card" then
+					return {
+						mult_mod = 4,
+						card = context.other_card
+					}
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Bonus Card" then
+					return {
+						chip_mod = 30,
+						card = context.other_card
+					}
+
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Stone Card" then
+					return {
+						chip_mod = 50,
+						card = context.other_card
+					}
+				end
+			end
+		end
+	end
+}
+
+
