@@ -990,15 +990,15 @@ SMODS.Joker{
 	end
 }
 
--- Insane Joker
+-- Forces of Nature
 SMODS.Joker{
-	key = 'insane_joker',
+	key = 'forces_of_nature',
 
 	loc_txt = {
-		name = 'Insane Joker',
+		name = 'Forces of Nature',
 		text = {
 			"Gains {C:white,X:mult}X#1#{} Mult for every",
-			"{C:attention}Wild 7 {}in your {C:attention}full deck{}",
+			"{C:attention}Wild 4 {}in your {C:attention}full deck{}",
 			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
 		}
 	},
@@ -1009,7 +1009,7 @@ SMODS.Joker{
 		card.ability.extra.Xmult = 1
 		if G.STAGE == G.STAGES.RUN then
 			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 7 and v.ability.name == "Wild Card" then
+				if v:get_id() == 4 and v.ability.name == "Wild Card" then
 					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
 				end
 			end
@@ -1035,13 +1035,13 @@ SMODS.Joker{
 	end
 }
 
--- TO DO: rename to Multitasking
--- Swiss Army Joker
+
+-- Multitasking
 SMODS.Joker{
-	key = 'swiss_army_joker',
+	key = 'multitasking',
 
 	loc_txt = {
-		name = 'Swiss Army Joker',
+		name = 'Multitasking',
 		text = {
 			"{C:mult}+#1# {}Mult on {C:attention}even{} hands",
 			"{C:chips}+#2# {}Chips on {C:attention}odd{} hands",
@@ -1185,8 +1185,8 @@ SMODS.Joker{
 	end
 }
 
--- TODO: maybe change name and effect to protect card with highest frequency
--- The Shield
+
+-- Phalanx
 function Card:set_debuff(should_debuff)
 	if(next(SMODS.find_card('j_mlnc_the_shield'))) then
 		local freq_ranks = {
@@ -1235,10 +1235,10 @@ function Card:set_debuff(should_debuff)
     end
 end
 SMODS.Joker{
-	key = 'the_shield',
+	key = 'phalanx',
 
 	loc_txt = {
-		name = 'The Shield',
+		name = 'Phalanx',
 		text = {
 			"The {C:attention}card {}with highest frequency",
 			"in your entire deck can",
@@ -1256,7 +1256,6 @@ SMODS.Joker{
 	blueprint_compat = false,
 }
 
---TODO: make it no longer be able to kill itself :)
 -- Betrayal
 SMODS.Joker{
 	key = 'betrayal',
@@ -1445,8 +1444,8 @@ local enhancements_list = {
 	"Mult Card",
 	"Bonus Card",
 	"Stone Card",
-	-- "Steel Card",
-	-- "Gold Card",
+	"Steel Card",
+	"Gold Card",
 }
 
 local igo = Game.init_game_object
@@ -1516,22 +1515,29 @@ SMODS.Joker{
 					local mult = 0
 					local money = 0
 					if pseudorandom('lucky_mult') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
-						mult = 5
+						mult = 20
 					end
 					if pseudorandom('lucky_money') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
-						money = true
-						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+						money = 20
+						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
 						G.E_MANAGER:add_event(Event({
 							func = (function()
 								G.GAME.dollar_buffer = 0; return true
 							end)
 						}))
 					end
-					return {
-						mult_mod = mult,
-						dollars = 0,
-						colour = G.C.MONEY
-					}
+					if money > 0 then
+						return {
+							mult_mod = mult,
+							dollars = money,
+							colour = G.C.MONEY
+						}
+					else
+						return {
+							mult_mod = mult,
+						}
+					end
+
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Glass Card" then
 					return {
 						Xmult_mod = 2,
@@ -1551,6 +1557,23 @@ SMODS.Joker{
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Stone Card" then
 					return {
 						chip_mod = 50,
+						card = context.other_card
+					}
+				end
+			end
+		end
+		if context.individual and context.cardarea == G.hand and not context.blueprint then
+			if context.other_card.ability.name == "Wild Card" then
+				if G.GAME.current_round.butterfly_card.enhancement == "Steel Card" and not context.end_of_round then
+					return {
+						x_mult = 1.5,
+						card = context.other_card
+					}
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Gold Card" and context.end_of_round then
+					G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + 3
+					G.E_MANAGER:add_event(Event({ func = (function() G.GAME.dollar_buffer = 0; return true end) }))
+					return {
+						dollars = 3,
 						card = context.other_card
 					}
 				end

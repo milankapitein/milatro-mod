@@ -1,5 +1,5 @@
 # Milatro Balatro Mod
-A silly little balatro mod. Currently has 28 jokers, with 2 more coming soon.
+A silly little balatro mod. Currently has 29 jokers, with 1 more coming soon.
 
 # How to Install
 - Step 1: Install [Steamodded](https://github.com/Steamodded/smods/wiki)
