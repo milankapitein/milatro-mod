@@ -1515,9 +1515,11 @@ SMODS.Joker{
 					local mult = 0
 					local money = 0
 					if pseudorandom('lucky_mult') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
+						context.other_card.lucky_trigger = true
 						mult = 20
 					end
-					if pseudorandom('lucky_money') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
+					if pseudorandom('lucky_money') < (G.GAME and G.GAME.probabilities.normal or 1) / 15 then
+						context.other_card.lucky_trigger = true
 						money = 20
 						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
 						G.E_MANAGER:add_event(Event({
@@ -1530,33 +1532,40 @@ SMODS.Joker{
 						return {
 							mult_mod = mult,
 							dollars = money,
-							colour = G.C.MONEY
+							colour = G.C.MONEY,
+							card = context.other_card
 						}
-					else
+					elseif mult > 0 then
 						return {
 							mult_mod = mult,
+							message = localize { type = 'variable', key = 'a_mult', vars = { mult } },
+							card = context.other_card
 						}
+					else return
 					end
-
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Glass Card" then
 					return {
 						Xmult_mod = 2,
+						message = localize { type = 'variable', key = 'a_xmult', vars = { 2 } },
 						card = context.other_card
 					}
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Mult Card" then
 					return {
 						mult_mod = 4,
+						message = localize { type = 'variable', key = 'a_mult', vars = { 4 } },
 						card = context.other_card
 					}
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Bonus Card" then
 					return {
 						chip_mod = 30,
+						message = localize { type = 'variable', key = 'a_chips', vars = { 30 } },
 						card = context.other_card
 					}
 
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Stone Card" then
 					return {
 						chip_mod = 50,
+						message = localize { type = 'variable', key = 'a_chips', vars = { 50 } },
 						card = context.other_card
 					}
 				end
