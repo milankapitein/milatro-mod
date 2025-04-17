@@ -1188,7 +1188,7 @@ SMODS.Joker{
 
 -- Phalanx
 function Card:set_debuff(should_debuff)
-	if(next(SMODS.find_card('j_mlnc_the_shield'))) then
+	if(next(SMODS.find_card('j_mlnc_phalanx'))) then
 		local freq_ranks = {
 			[2] = 0,
 			[3] = 0,
