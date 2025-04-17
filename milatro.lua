@@ -86,8 +86,7 @@ SMODS.Joker {
 		if context.before and #context.full_hand == 1 and not context.blueprint then
 			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_gain
 			card.ability.extra.mult = card.ability.extra.mult +
-				card.ability.extra
-				.mult_gain -- maybe change to self.extra? spare trousers does it like that
+				card.ability.extra.mult_gain
 			return {
 				message = 'Upgrade!',
 				card = card
@@ -150,7 +149,7 @@ SMODS.Joker {
 		}
 	},
 
-	config = { extra = { chips_gain = 10, chips = 0 } },
+	config = { extra = { chips_gain = 7, chips = 0 } },
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips_gain, card.ability.extra.chips } }
@@ -229,16 +228,13 @@ SMODS.Joker {
 	config = { extra = {} },
 
 	loc_vars = function(self, info_queue, card)
-		-- This is the way to add an info_queue, which is extra information about other cards
-		-- like Stone Cards on Marble/Stone Jokers, Steel Cards on Steel Joker, and
-		-- in this case, information about negative editions on Perkeo.
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
 	end,
 
-	rarity = 1,
+	rarity = 3,
 	atlas = 'MilatroMod',
 	pos = { x = 4, y = 0 },
-	cost = 4,
+	cost = 9,
 
 	unlocked = true,
 	discovered = true,
@@ -261,10 +257,11 @@ SMODS.Joker {
 	config = { extra = { mult_gain = 3, mult = 0 } },
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_stone
 		return { vars = { card.ability.extra.mult_gain, card.ability.extra.mult } }
 	end,
 
-	rarity = 2,
+	rarity = 1,
 	atlas = 'MilatroMod',
 	pos = { x = 5, y = 0 },
 	cost = 5,
@@ -305,6 +302,7 @@ SMODS.Joker {
 	config = { extra = { repetitions = 1 } },
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_stone
 		return { vars = { card.ability.extra.repetitions + 1 } }
 	end,
 
@@ -410,6 +408,7 @@ SMODS.Joker {
 	config = { extra = { mult = 30 } },
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
 		return { vars = { card.ability.extra.mult } }
 	end,
 
@@ -609,7 +608,8 @@ SMODS.Joker {
 		}
 	},
 
-	loc_vars = function(self, ifno_queue, card)
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
 	end,
 
 	rarity = 3,
@@ -778,8 +778,7 @@ SMODS.Joker{
 }
 
 -- The Reaper
--- TODO: fix if hand contains 2 blue seals, it will add a reaper and 2 planets, even with 2 slots only
-local last_hand
+-- TODO: add a 1/2 chance & fix the bug where it goes over the consumable limit if you have blue seal
 SMODS.Joker{
 	key = 'the_reaper',
 
@@ -790,6 +789,12 @@ SMODS.Joker{
 			"a {C:attention}Pair{}, create a {C:tarot}Death Tarot{} card"
 		}
 	},
+
+	config = {extra = {last_hand = 0} },
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.c_death
+	end,
 
 	rarity = 1,
 	atlas = 'MilatroMod',
@@ -802,9 +807,9 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before then
-			last_hand = next(context.poker_hands['Pair'])
+			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
-		if context.end_of_round and not context.individual and not context.repetition and last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards then
+		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards then
 			G.E_MANAGER:add_event(Event({
 				func = function()
 					card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_death')
@@ -829,7 +834,7 @@ SMODS.Joker{
 		text = {
 			"This Joker gains {C:white,X:mult}X#1# {} Mult if a {C:attention}Lucky {}card",
 			"{C:red}unsuccesfully {}triggers, loses {C:white,X:mult}X#2# {} Mult",
-			"for a {C:green}succesfull {}trigger",
+			"for a {C:green}succesful {}trigger",
 			"{C:inactive}(Currently {C:white,X:mult}X#3# {C:inactive} Mult)"
 		}
 	},
@@ -837,6 +842,7 @@ SMODS.Joker{
 	config = { extra = { Xmult_gain = 0.1, Xmult_loss = 0.2, Xmult = 1}},
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_lucky
 		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult_loss, card.ability.extra.Xmult}}
 	end,
 
@@ -893,7 +899,7 @@ SMODS.Joker{
 		text = {
 			"Sell this Joker to remove",
 			"all {C:attention}3s {}from full deck",
-			"Earn {C:money}$#2# {} for each {C:attention}3 {}destroyed",
+			"Earn {C:money}$#2# {}for each {C:attention}3 {}destroyed",
 			"{C:inactive}(Currently {C:attention}#1# {C:inactive}cards to remove)"
 		}
 	},
@@ -962,6 +968,7 @@ SMODS.Joker{
 	config = { extra = {tags = 2} },
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_TAGS.tag_juggle
 		return { vars = {card.ability.extra.tags }}
 	end,
 
@@ -990,12 +997,12 @@ SMODS.Joker{
 	end
 }
 
--- Forces of Nature
+-- Force of Nature
 SMODS.Joker{
-	key = 'forces_of_nature',
+	key = 'force_of_nature',
 
 	loc_txt = {
-		name = 'Forces of Nature',
+		name = 'Force of Nature',
 		text = {
 			"Gains {C:white,X:mult}X#1#{} Mult for every",
 			"{C:attention}Wild 4 {}in your {C:attention}full deck{}",
@@ -1006,6 +1013,7 @@ SMODS.Joker{
 	config = { extra = { Xmult_gain = 1, Xmult = 1}},
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
 		card.ability.extra.Xmult = 1
 		if G.STAGE == G.STAGES.RUN then
 			for k, v in pairs(G.playing_cards) do
@@ -1017,7 +1025,7 @@ SMODS.Joker{
 		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult}}
 	end,
 
-	rarity = 2,
+	rarity = 3,
 	atlas = 'MilatroMod',
 	pos = { x = 9, y = 1 },
 	cost = 7,
@@ -1034,7 +1042,6 @@ SMODS.Joker{
 		end
 	end
 }
-
 
 -- Multitasking
 SMODS.Joker{
@@ -1134,6 +1141,7 @@ SMODS.Joker{
 	end
 }
 
+--TODO: fix effect if seals > consumable slots. overflows
 -- Magic Hat
 SMODS.Joker{
 	key = 'magic_hat',
@@ -1145,6 +1153,11 @@ SMODS.Joker{
 			"can activate when played"
 		}
 	},
+
+	loc_vars = function(self, info_queue)
+		info_queue[#info_queue+1] = G.P_SEALS.Blue
+		info_queue[#info_queue+1] = G.P_SEALS.Purple
+	end,
 
 	rarity = 1,
 	atlas = 'MilatroMod',
@@ -1277,7 +1290,7 @@ SMODS.Joker{
 	rarity = 2,
 	atlas = 'MilatroMod',
 	pos = { x = 4, y = 2 },
-	cost = 4,
+	cost = 7,
 
 	unlocked = true,
 	discovered = true,
@@ -1365,6 +1378,7 @@ SMODS.Joker{
 	config = {extra = {Xmult_gain = 10, Xmult = 1}},
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.j_joker
 		local jimbos = SMODS.find_card('j_joker')
 		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain}}
 	end,
@@ -1389,12 +1403,12 @@ SMODS.Joker{
 	end
 }
 
--- Rolling Boulder
+-- Recursive Joker
 SMODS.Joker{
-	key = 'rolling_boulder',
+	key = 'recursive_joker',
 
 	loc_txt = {
-		name = 'Rolling Boulder',
+		name = 'Recursive Joker',
 		text = {
 			"{C:mult}+#1# {}Mult per hand played",
 			"{C:mult}-#2# {}Mult after defeating {C:attention}Boss Blind{}",
@@ -1475,6 +1489,7 @@ SMODS.Joker{
 	config = { vars = { enhancement = ""} },
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
 		return { vars = { G.GAME.current_round.butterfly_card.enhancement}}
 	end,
 
@@ -1591,4 +1606,69 @@ SMODS.Joker{
 	end
 }
 
+-- How Hungry
+SMODS.Joker{
+	key = 'how_hungry',
 
+	loc_txt = {
+		name = 'How Hungry',
+		text = {
+			"If hand contains both a",
+			"scoring {C:attention}7 {}and {C:attention}9{},",
+			"destroy all scoring {C:attention}9s{} and earn {C:money}$#1#{}"
+		}
+	},
+
+	config = { extra = {dollars = 5, contains7 = false}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.dollars}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 9, y = 2 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	calculate = function(self, card, context)
+		if context.before and not context.blueprint then
+			for i = 1, #context.scoring_hand do
+				if context.scoring_hand[i]:get_id() == 7 then
+					card.ability.extra.contains7 = true
+				end
+			end
+		end
+
+		if context.after and not context.blueprint then
+			for i = 1, #context.scoring_hand do 
+				if context.full_hand[i]:get_id() == 9 then
+					G.E_MANAGER:add_event(Event({
+						trigger = 'after',
+						delay = 0.2,
+						func = function() 
+								local card = context.full_hand[i]
+								if card.ability.name == 'Glass Card' then 
+									card:shatter()
+								else
+									card:start_dissolve(nil, i)
+								end
+							return true end }))
+						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+							G.E_MANAGER:add_event(Event({
+								func = (function()
+									G.GAME.dollar_buffer = 0; return true
+								end)
+							}))
+					return {
+						message = "Yummy"
+					}
+				end
+			end
+			card.ability.extra.contains7 = false
+		end
+	end
+}
