@@ -66,21 +66,19 @@ SMODS.Joker {
 	rarity = 3,
 	atlas = 'MilatroMod',
 	pos = { x = 1, y = 0 },
-	cost = 8,
+	cost = 9,
 
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
-
-
+	perishable_compat = false,
 
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				mult_mod = card.ability.extra.mult,
-				chip_mod = card.ability.extra.chips,
-				--TODO: currently only says +mult, add definition to dictionary for both mult and chips so it prints that correctly
-				message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+				mult = card.ability.extra.mult,
+				chips = card.ability.extra.chips,
+				card = card
 			}
 		end
 		if context.before and #context.full_hand == 1 and not context.blueprint then
@@ -88,7 +86,7 @@ SMODS.Joker {
 			card.ability.extra.mult = card.ability.extra.mult +
 				card.ability.extra.mult_gain
 			return {
-				message = 'Upgrade!',
+				message = localize('k_upgrade_ex'),
 				card = card
 			}
 		end
@@ -149,7 +147,7 @@ SMODS.Joker {
 		}
 	},
 
-	config = { extra = { chips_gain = 7, chips = 0 } },
+	config = { extra = { chips_gain = 4, chips = 0 } },
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.chips_gain, card.ability.extra.chips } }
@@ -163,6 +161,7 @@ SMODS.Joker {
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	perishable_compat = false,
 
 	calculate = function(self, card, context)
 		if context.joker_main then
@@ -174,8 +173,7 @@ SMODS.Joker {
 		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand] then
 			card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chips_gain
 			return {
-				message = '+15 chips',
-				colour = G.C.CHIPS,
+				message = localize('k_upgrade_ex'),
 				card = card
 			}
 		end
@@ -269,6 +267,7 @@ SMODS.Joker {
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	perishable_compat = false,
 
 	calculate = function(self, card, context)
 		if context.joker_main then
@@ -280,8 +279,7 @@ SMODS.Joker {
 		if context.individual and context.cardarea == G.play and context.other_card:get_id() < 0 and not context.blueprint then
 			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
 			return {
-				message = '+3 Mult',
-				colour = G.C.Mult,
+				message = localize('k_upgrade_ex'),
 				card = card
 			}
 		end
@@ -320,8 +318,6 @@ SMODS.Joker {
 			if context.other_card:get_id() < 0 then
 				return {
 					message = localize('k_again_ex'),
-					-- repetitions = card.ability.extra.repetitions,
-					-- card = context.other_card
 					repetitions = card.ability.extra.repetitions,
 					card = context.self
 				}
@@ -384,7 +380,7 @@ SMODS.Joker {
 		}
 	end,
 
-	rarity = 2,
+	rarity = 1,
 	atlas = 'MilatroMod',
 	pos = { x = 7, y = 0 },
 	cost = 7,
@@ -425,9 +421,8 @@ SMODS.Joker {
 		if context.individual and context.cardarea == G.play then
 			if context.other_card == context.full_hand[1] and context.other_card.config.center.key == "m_wild" then
 				return {
-					-- TODO: fix the position of text, blueprint says it at the joker, but wild west at the card
 					mult = card.ability.extra.mult,
-					card = context.other_card,
+					card = card,
 					message = "YEEE-HAW!"
 				}
 			end
@@ -615,7 +610,7 @@ SMODS.Joker {
 	rarity = 3,
 	atlas = 'MilatroMod',
 	pos = { x = 2, y = 1 },
-	cost = 7,
+	cost = 8,
 
 	unlocked = true,
 	discovered = true,
@@ -690,15 +685,13 @@ SMODS.Joker {
 			G.E_MANAGER:add_event(Event({
 				func = function()
 					-- TODO: make ease_discard show each instance of adding mult or total when multiple copies
-					ease_discard(card.ability.extra.discards)
+					ease_discard(card.ability.extra.discards, false, true)
 					if G.GAME.current_round.hands_left > 1 then
 						local hand_UI = G.HUD:get_UIE_by_ID('hand_UI_count')
 						local col = G.C.RED
 						local diff = (-G.GAME.current_round.hands_left + 1)
 						G.GAME.current_round.hands_left = 1
 						hand_UI.config.object:update()
-						G.HUD:recalculate()
-						
 						attention_text({
 							text = tostring(diff),
 							scale = 0.8,
@@ -707,13 +700,15 @@ SMODS.Joker {
 							cover_colour = col,
 							align = 'cm',
 						})
-						play_sound('chips2')
-					else
-						return true
 					end
+					play_sound('chips2')
+					G.HUD:recalculate()
 					return true
 				end
 			}))
+			return {
+				message = "+5 Discards"
+			}
 		end
 	end
 
@@ -727,7 +722,7 @@ SMODS.Joker{
 		name = 'Loan Shark',
 		text = {
 			"This Joker gains {C:white,X:mult}X#1# {} Mult for",
-			"each {C:money}1${} below {C:money}0{}",
+			"each {C:money}$1{} below {C:money}0{}",
 			"Go up to {C:red}-$#2#{} in debt",
 			"{C:inactive}(Currently {C:white,X:mult}X#3#{C:inactive} Mult)"
 		}
@@ -777,8 +772,8 @@ SMODS.Joker{
 	end
 }
 
+-- TODO: investigate when it perishes, cause i only got 1 planet from 2 blue seals after it perished. it still made a tarot then. i think i fixed it with the not card.debuff
 -- The Reaper
--- TODO: add a 1/2 chance & fix the bug where it goes over the consumable limit if you have blue seal
 SMODS.Joker{
 	key = 'the_reaper',
 
@@ -786,14 +781,17 @@ SMODS.Joker{
 		name = 'The Reaper',
 		text = {
 			"If the {C:attention}winning hand{} of round contains",
-			"a {C:attention}Pair{}, create a {C:tarot}Death Tarot{} card"
+			"a {C:attention}Pair{}, {C:green,E:1}#1# in #2#{} chance",
+			"to create a {C:tarot}Death Tarot{} card"
 		}
 	},
 
-	config = {extra = {last_hand = 0} },
+	config = {extra = {min = 1, odds = 2, last_hand = 0} },
 
 	loc_vars = function(self, info_queue, card)
+		card.ability.extra.min = (G.GAME and G.GAME.probabilities.normal or 1)
 		info_queue[#info_queue+1] = G.P_CENTERS.c_death
+		return { vars = {card.ability.extra.min, card.ability.extra.odds}}
 	end,
 
 	rarity = 1,
@@ -809,18 +807,28 @@ SMODS.Joker{
 		if context.before then
 			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
-		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards then
-			G.E_MANAGER:add_event(Event({
-				func = function()
-					card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_death')
-					card:add_to_deck()
-					G.consumeables:emplace(card)
-					return true
-				end
-			}))
-			return{
-				message = 'Death comes...'
-			}
+		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards and not card.debuff then
+			if pseudorandom('reaper') < G.GAME.probabilities.normal/card.ability.extra.odds then
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_death')
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+						return true
+					end
+				}))
+				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+				return{
+					message = 'Death comes...'
+				}
+			else
+				return{
+					message = 'Death waits...'
+				}
+			end
+		end
+		if context.after then
+			G.GAME.consumeable_buffer = 0
 		end
 	end
 }
@@ -854,6 +862,7 @@ SMODS.Joker{
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	perishable_compat = false,
 
 	calculate = function(self, card, context)
 		if context.joker_main then
@@ -926,6 +935,7 @@ SMODS.Joker{
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	eternal_compat = false,
 
 	calculate = function(self, card, context)
 		if context.selling_self then
@@ -980,6 +990,7 @@ SMODS.Joker{
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	eternal_compat = false,
 
 	calculate = function(self, card, context)
 		if context.selling_self then
@@ -1110,7 +1121,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { min = 1, odds = 2}},
+	config = { extra = { min = 1, odds = 3}},
 
 	loc_vars = function(self, info_queue, card)
 		card.ability.extra.min = (G.GAME and G.GAME.probabilities.normal or 1)
@@ -1141,7 +1152,6 @@ SMODS.Joker{
 	end
 }
 
---TODO: fix effect if seals > consumable slots. overflows
 -- Magic Hat
 SMODS.Joker{
 	key = 'magic_hat',
@@ -1186,6 +1196,8 @@ SMODS.Joker{
 					end
 					return true
 				end)}))
+				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "hat")
 		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
             G.E_MANAGER:add_event(Event({
                 func = (function()
@@ -1194,6 +1206,10 @@ SMODS.Joker{
                         G.consumeables:emplace(card)
                     return true
                 end)}))
+				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+		end
+		if context.after then
+			G.GAME.consumeable_buffer = 0
 		end
 	end
 }
@@ -1259,10 +1275,10 @@ SMODS.Joker{
 		}
 	},
 
-	rarity = 1,
+	rarity = 2,
 	atlas = 'MilatroMod',
 	pos = { x = 3, y = 2 },
-	cost = 5,
+	cost = 7,
 
 	unlocked = true,
 	discovered = true,
@@ -1337,7 +1353,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = {Xmult = 3.5}},
+	config = { extra = {Xmult = 4}},
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.Xmult }}
@@ -1358,47 +1374,6 @@ SMODS.Joker{
 				Xmult_mod = card.ability.extra.Xmult,
 				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
 			}
-		end
-	end
-}
-
--- The Legend of Jimbo 
-SMODS.Joker{
-	key = 'the_legend_of_jimbo',
-
-	loc_txt = {
-		name = 'The Legend of Jimbo',
-		text = {
-			"This Joker gains {C:white,X:mult}X#1#{} Mult",
-			"for each {E:2,T:j_joker}Jimbo {}in your Joker slots",
-			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
-		}
-	},
-
-	config = {extra = {Xmult_gain = 10, Xmult = 1}},
-
-	loc_vars = function(self, info_queue, card)
-		info_queue[#info_queue+1] = G.P_CENTERS.j_joker
-		local jimbos = SMODS.find_card('j_joker')
-		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain}}
-	end,
-
-	rarity = 3,
-	atlas = 'MilatroMod',
-	pos = { x = 6, y = 2 },
-	cost = 8,
-
-	unlocked = true,
-	discovered = true,
-	blueprint_compat = true,
-
-	calculate = function(self, card, context)
-		if context.joker_main then
-			local jimbos = SMODS.find_card('j_joker')
-			return {
-				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain } }
-			}	
 		end
 	end
 }
@@ -1430,6 +1405,7 @@ SMODS.Joker{
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	perishable_compat = false,
 
 	calculate = function(self, card, context)
 		if context.joker_main then
@@ -1481,8 +1457,10 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Butterfly Effect',
 		text = {
-			"{C:attention}Wild Cards{} have the additional effect of {C:attention}#1#{}",
-			"Enhancement changes at the end of each round"
+			"{C:attention}Wild Cards{} have the ",
+			"additional effect of {C:attention}#1#s{}",
+			"Enhancement changes at ",
+			"the end of each round"
 		}
 	},
 
@@ -1522,7 +1500,6 @@ SMODS.Joker{
         --     end
         -- end
 
-		--TODO: add effects
 		if context.individual and context.cardarea == G.play and not context.blueprint then
 			if context.other_card.ability.name == "Wild Card" then
 				-- TO DO: make this code work better by not hard coding effect
@@ -1669,6 +1646,47 @@ SMODS.Joker{
 				end
 			end
 			card.ability.extra.contains7 = false
+		end
+	end
+}
+
+-- The Legend of Jimbo 
+SMODS.Joker{
+	key = 'the_legend_of_jimbo',
+
+	loc_txt = {
+		name = 'The Legend of Jimbo',
+		text = {
+			"This Joker gains {C:white,X:mult}X#1#{} Mult",
+			"for each {E:2,T:j_joker}Jimbo {}in your Joker slots",
+			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = {extra = {Xmult_gain = 10, Xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.j_joker
+		local jimbos = SMODS.find_card('j_joker')
+		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 6, y = 2 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local jimbos = SMODS.find_card('j_joker')
+			return {
+				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
+				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain } }
+			}	
 		end
 	end
 }
