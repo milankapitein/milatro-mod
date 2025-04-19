@@ -1333,7 +1333,6 @@ SMODS.Joker{
 				end)
 			}))
 			return {
-				message = tostring(#destructable_jokers),
 				dollars = card.ability.extra.dollars,
 				colour = G.C.MONEY
 			}
