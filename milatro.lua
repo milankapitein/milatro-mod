@@ -847,7 +847,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { Xmult_gain = 0.1, Xmult_loss = 0.2, Xmult = 1}},
+	config = { extra = { Xmult_gain = 0.1, Xmult_loss = 0.1, Xmult = 1}},
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_CENTERS.m_lucky
@@ -1390,7 +1390,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { mult_gain = 5, mult_loss = 25, mult = 0}},
+	config = { extra = { mult_gain = 4, mult_loss = 20, mult = 0}},
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_loss, card.ability.extra.mult}}
@@ -1591,11 +1591,11 @@ SMODS.Joker{
 		text = {
 			"If hand contains both a",
 			"scoring {C:attention}7 {}and {C:attention}9{},",
-			"destroy all scoring {C:attention}9s{} and earn {C:money}$#1#{}"
+			"destroy {C:attention}1 {}scoring {C:attention}9{} and earn {C:money}$#1#{}"
 		}
 	},
 
-	config = { extra = {dollars = 5, contains7 = false}},
+	config = { extra = {dollars = 6, contains7 = false}},
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars}}
@@ -1619,27 +1619,32 @@ SMODS.Joker{
 			end
 		end
 
-		if context.after and not context.blueprint then
+		-- TODO: fix this whole joker. it grants no more money, 
+		if not context.blueprint and context.destroying_card then
+			sendTraceMessage("gets here", "hhungry")
 			for i = 1, #context.scoring_hand do 
-				if context.full_hand[i]:get_id() == 9 then
+				if context.scoring_hand[i]:get_id() == 9 and card.ability.extra.contains7 then
 					G.E_MANAGER:add_event(Event({
 						trigger = 'after',
 						delay = 0.2,
 						func = function() 
-								local card = context.full_hand[i]
-								if card.ability.name == 'Glass Card' then 
-									card:shatter()
+								local diff_card = context.scoring_hand[i]
+								if diff_card.ability.name == 'Glass Card' then 
+									diff_card:shatter()
 								else
-									card:start_dissolve(nil, i)
-								end
-							return true end }))
+									diff_card:start_dissolve()
+								end return true end }))
+
 						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
 							G.E_MANAGER:add_event(Event({
 								func = (function()
 									G.GAME.dollar_buffer = 0; return true
 								end)
 							}))
+					card.ability.extra.contains7 = false
 					return {
+						remove = true,
+						card = context.other_card,
 						message = "Yummy"
 					}
 				end

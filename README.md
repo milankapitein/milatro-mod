@@ -6,7 +6,7 @@ You can find what all the Jokers do [here](https://milankapitein.github.io/index
 
 # How to Install
 - Step 1: Install [Steamodded](https://github.com/Steamodded/smods/wiki)
-- Step 2: Download the [latest release](https://github.com/milankapitein/milatro-mod/releases/tag/v1.0.0) from the Release category.
+- Step 2: Download the [latest release](https://github.com/milankapitein/milatro-mod/releases/tag/v1.0.0) from the Release category or download the ZIP to get the latest, potentially experimental release.
 - Step 3: Put the ``milatro`` folder into your mods folder. Make sure the repository looks like the following
 ```
 -- Mods
