@@ -18,7 +18,7 @@ You can find what all the Jokers do [here](https://milankapitein.github.io/index
 ```
 
 # Contact & Credits
-For any issues with the mod, please let me know by opening an issue or reaching out to me on [BlueSky](https://bsky.app/profile/cactuzswag.bsky.social)
+For any issues with the mod, please let me know by opening an issue, letting me know in the Milatro Mod post in the official Balatro Discord or reaching out to me on [BlueSky](https://bsky.app/profile/cactuzswag.bsky.social)
 
 The amazing art was made by [Emilia](https://bsky.app/profile/emiliavi.bsky.social)
 
