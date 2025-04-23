@@ -728,10 +728,15 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { Xmult_gain = 0.5, debt = 5, Xmult = 1}},
+	config = { extra = { Xmult_gain = 0.5, debt = 5, Xmult = 1, compareNum = 0}},
 
 	loc_vars = function(self, info_queue, card)
-		if G.GAME.dollars < 0 then
+		card.ability.extra.compareNum = 0
+		if SMODS.find_mod('Talisman') == nil then
+			sendTraceMessage(tostring(SMODS.Mods['Talisman']),"loanshark")
+			card.ability.extra.compareNum = to_big(0)
+		end
+		if G.GAME.dollars < card.ability.extra.compareNum then
 			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.debt, card.ability.extra.Xmult + math.abs(G.GAME.dollars) * card.ability.extra.Xmult_gain }}
 		else
 			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.debt, card.ability.extra.Xmult }}
@@ -759,7 +764,7 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main then
 			local mult = 0
-			if G.GAME.dollars < 0 then
+			if G.GAME.dollars < card.ability.extra.compareNum then
 				mult = card.ability.extra.Xmult + math.abs(G.GAME.dollars) * card.ability.extra.Xmult_gain
 			else
 				mult = card.ability.extra.Xmult
@@ -1197,7 +1202,6 @@ SMODS.Joker{
 					return true
 				end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "hat")
 		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
             G.E_MANAGER:add_event(Event({
                 func = (function()
