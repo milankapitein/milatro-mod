@@ -1,4 +1,5 @@
 # Milatro Balatro Mod
+!(Page 1 of added jokers)[./assets/ModPic.jpg]
 A silly little balatro mod. Currently has 30 jokers.
 
 # Jokers
@@ -16,6 +17,9 @@ You can find what all the Jokers do [here](https://milankapitein.github.io/index
         -- milatro.json
         -- milatro.lua
 ```
+
+# Compatibility
+I've not tested this many other mods so if there are any issues let me know. I've minimally tested it with Talisman, and that seems to work.
 
 # Contact & Credits
 For any issues with the mod, please let me know by opening an issue, letting me know in the Milatro Mod post in the official Balatro Discord or reaching out to me on [BlueSky](https://bsky.app/profile/cactuzswag.bsky.social)
