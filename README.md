@@ -1,5 +1,5 @@
 # Milatro Balatro Mod
-!(Page 1 of added jokers)[/assets/ModPic.jpg]
+![Page 1 of added jokers](/assets/ModPic.jpg)
 A silly little balatro mod. Currently has 30 jokers.
 
 # Jokers
