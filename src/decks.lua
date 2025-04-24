@@ -105,11 +105,13 @@ SMODS.Back {
     key = "space",
     atlas = "MilatroMod",
     pos = {x = 0, y = 0},
-    loc = {
+
+    loc_txt = {
         name = "Space Deck",
         text = {
-            "Start with a Black Hole Spectral card,", 
-            "Planet Merchant voucher and ",
+            "Start with a Black Hole", 
+            "Spectral card, Planet",
+            "Merchant voucher and ",
             "after defeating Boss Blind,",
             "create an Orbital Tag"
         }
@@ -126,9 +128,26 @@ SMODS.Back {
     apply = function ()
         G.E_MANAGER:add_event(Event({
             func = function()
-                
+                local card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_black_hole')
+                card:add_to_deck()
+                G.consumeables:emplace(card)
                 return true
             end
         }))
+    end,
+
+    calculate = function(self, back, context)
+        if context.end_of_round and not context.repetition and not context.individual and G.GAME.blind.boss then
+            G.E_MANAGER:add_event(Event({
+                func = (function()
+                    local tag = Tag('tag_orbital')
+                    tag.ability.orbital_hand = G.handlist[pseudorandom('orbital_hand', 1, #G.handlist)] 
+                    add_tag(tag)
+                    play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+                    play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+                    return true
+                end)
+            }))
+        end
     end
 }
