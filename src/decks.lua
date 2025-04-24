@@ -188,3 +188,46 @@ SMODS.Back {
         }))
     end
 }
+
+-- Savings Deck
+SMODS.Back {
+    name = "Savings Deck",
+    key = "savings",
+    atlas = "MilatroMod",
+    pos = {x = 0, y = 0},
+
+    loc_txt = {
+        name = "Savings Deck",
+        text = {
+            "Start run with",
+            "{C:money,T:v_seed_money}Seed Money{}, {C:money,T:v_money_tree}Money Tree{}",
+            "and {T:c_hermit,C:tarot}Hermit{}. Extra {C:blue}hands{}",
+            "earn no extra money"
+        }
+    },
+
+    unlocked = true,
+    discovered = true,
+
+    config = { vouchers = {"v_seed_money", "v_money_tree"}},
+    loc_vars = function(self, info_queue, center)
+        return { vars = {}}
+    end,
+
+    apply = function()
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                local card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_hermit')
+                card:add_to_deck()
+                G.consumeables:emplace(card)
+                return true
+            end
+        }))
+    end,
+
+    calculate = function(self, back, context)
+        if context.end_of_round then
+            G.GAME.current_round.hands_left = 0
+        end
+    end
+}
