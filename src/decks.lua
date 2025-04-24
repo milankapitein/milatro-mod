@@ -174,6 +174,4 @@ SMODS.Back {
     loc_vars = function(self, info_queue, center)
         return { vars = {}}
     end,
-
-
 }
