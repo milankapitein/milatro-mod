@@ -109,11 +109,10 @@ SMODS.Back {
     loc_txt = {
         name = "Space Deck",
         text = {
-            "Start with a Black Hole", 
-            "Spectral card, Planet",
-            "Merchant voucher and ",
-            "after defeating Boss Blind,",
-            "create an Orbital Tag"
+            "Start with {C:spectral,T:c_black_hole}Black Hole{},", 
+            "{C:planet,T:v_planet_merchant}Planet Merchant{} and",
+            "after defeating {C:attention}Boss Blind{},",
+            "create an {C:planet,T:tag_orbital}Orbital Tag{}"
         }
     },
 
@@ -162,8 +161,9 @@ SMODS.Back {
     loc_txt = {
         name = "Unboxing Deck",
         text = {
-            "Start with a Turbo Boost",
-            "Nitro Boost and Hallucination"
+            "Start run with",
+            "{C:attention,T:v_mlnc_turbo_v}Turbo Boost{}, {C:attention,T:v_mlnc_nitro_v}Nitro Boost{}",
+            "and {C:attention,T:j_hallucination,E:2}Hallucination{}"
         }
     },
 
@@ -171,7 +171,8 @@ SMODS.Back {
     discovered = true,
 
     config = { vouchers = {"v_mlnc_turbo_v", "v_mlnc_nitro_v"}},
+
     loc_vars = function(self, info_queue, center)
         return { vars = {}}
-    end,
+    end
 }

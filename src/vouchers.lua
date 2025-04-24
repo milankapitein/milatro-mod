@@ -16,8 +16,8 @@ SMODS.Voucher{
     loc_txt = {
         name = "Turbo Boost",
         text = {
-            "Shops start with",
-            "3 Booster packs"
+            "{C:attention}+1{} Booster pack",
+            "available in the shop"
         }
     },
 
@@ -42,8 +42,8 @@ SMODS.Voucher{
     loc_txt = {
         name = "Nitro Boost",
         text = {
-            "Every reroll also restocks 1",
-            "Booster Pack, up to 1."
+            "Every reroll also restocks {C:attention}1{}",
+            "Booster Pack, up to {C:attention}1{}"
         }
     },
 
