@@ -151,3 +151,29 @@ SMODS.Back {
         end
     end
 }
+
+-- Unboxing Deck
+SMODS.Back {
+    name = "Unboxing Deck",
+    key = "unboxing",
+    atlas = "MilatroMod",
+    pos = {x = 0, y = 0},
+
+    loc_txt = {
+        name = "Unboxing Deck",
+        text = {
+            "Start with a Turbo Boost",
+            "Nitro Boost and Hallucination"
+        }
+    },
+
+    unlocked = true,
+    discovered = true,
+
+    config = { vouchers = {"v_mlnc_turbo_v", "v_mlnc_nitro_v"}},
+    loc_vars = function(self, info_queue, center)
+        return { vars = {}}
+    end,
+
+
+}

@@ -1,0 +1,119 @@
+SMODS.Atlas {
+	-- Key for code to find it with
+	key = "MilatroMod",
+	-- The name of the file, for the code to pull the atlas from
+	path = "MilatroJokers.png",
+	-- Width of each sprite in 1x size
+	px = 71,
+	-- Height of each sprite in 1x size
+	py = 95
+}
+
+SMODS.Voucher{
+    key = "turbo_v",
+    atlas = "MilatroMod",
+    pos = { x = 0, y = 0},
+    loc_txt = {
+        name = "Turbo Boost",
+        text = {
+            "Shops start with",
+            "3 Booster packs"
+        }
+    },
+
+    cost = 10,
+
+    unlocked = true,
+    discovered = true,
+
+    loc_vars = function(self, info_queue)
+        return { vars = {} }
+    end,
+
+    redeem = function(self, card)
+        SMODS.change_booster_limit(1)
+    end
+}
+
+SMODS.Voucher{
+    key = "nitro_v",
+    atlas = "MilatroMod",
+    pos = { x = 0, y = 0},
+    loc_txt = {
+        name = "Nitro Boost",
+        text = {
+            "Every reroll also restocks 1",
+            "Booster Pack, up to 1."
+        }
+    },
+
+    cost = 10,
+
+    unlocked = true,
+    discovered = true,
+
+    loc_vars = function(self, info_queue)
+        return { vars = {} }
+    end,
+}
+
+G.FUNCS.reroll_shop = function(e) 
+    stop_use()
+    G.CONTROLLER.locks.shop_reroll = true
+    if G.CONTROLLER:save_cardarea_focus('shop_jokers') then G.CONTROLLER.interrupt.focus = true end
+    if G.GAME.current_round.reroll_cost > 0 then 
+      inc_career_stat('c_shop_dollars_spent', G.GAME.current_round.reroll_cost)
+      inc_career_stat('c_shop_rerolls', 1)
+      ease_dollars(-G.GAME.current_round.reroll_cost)
+    end
+    G.E_MANAGER:add_event(Event({
+        trigger = 'immediate',
+        func = function()
+          local final_free = G.GAME.current_round.free_rerolls > 0
+          G.GAME.current_round.free_rerolls = math.max(G.GAME.current_round.free_rerolls - 1, 0)
+          G.GAME.round_scores.times_rerolled.amt = G.GAME.round_scores.times_rerolled.amt + 1
+
+          calculate_reroll_cost(final_free)
+          for i = #G.shop_jokers.cards,1, -1 do
+            local c = G.shop_jokers:remove_card(G.shop_jokers.cards[i])
+            c:remove()
+            c = nil
+          end
+
+          --save_run()
+
+          play_sound('coin2')
+          play_sound('other1')
+
+          if G.GAME.used_vouchers.v_mlnc_nitro_v then
+            sendTraceMessage("itreaches", "nitro")
+          end
+          
+          for i = 1, G.GAME.shop.joker_max - #G.shop_jokers.cards do
+            local new_shop_card = create_card_for_shop(G.shop_jokers)
+            G.shop_jokers:emplace(new_shop_card)
+            new_shop_card:juice_up()
+          end
+          return true
+        end
+      }))
+      G.E_MANAGER:add_event(Event({
+        trigger = 'after',
+        delay = 0.3,
+        func = function()
+        G.E_MANAGER:add_event(Event({
+          func = function()
+            G.CONTROLLER.interrupt.focus = false
+            G.CONTROLLER.locks.shop_reroll = false
+            G.CONTROLLER:recall_cardarea_focus('shop_jokers')
+            for i = 1, #G.jokers.cards do
+              G.jokers.cards[i]:calculate_joker({reroll_shop = true})
+            end
+            return true
+          end
+        }))
+        return true
+      end
+    }))
+    G.E_MANAGER:add_event(Event({ func = function() save_run(); return true end}))
+  end
