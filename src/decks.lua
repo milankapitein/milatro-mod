@@ -163,7 +163,7 @@ SMODS.Back {
         text = {
             "Start run with",
             "{C:attention,T:v_mlnc_turbo_v}Turbo Boost{}, {C:attention,T:v_mlnc_nitro_v}Nitro Boost{}",
-            "and {C:attention,T:j_hallucination,E:2}Hallucination{}"
+            "and {T:j_hallucination,C:common,E:2}Hallucination{}"
         }
     },
 
@@ -171,8 +171,20 @@ SMODS.Back {
     discovered = true,
 
     config = { vouchers = {"v_mlnc_turbo_v", "v_mlnc_nitro_v"}},
-
     loc_vars = function(self, info_queue, center)
         return { vars = {}}
+    end,
+
+    apply = function()
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                local card = create_card(nil, G.jokers, nil, nil, nil, nil, 'j_hallucination')
+                card:add_to_deck()
+                G.jokers:emplace(card)
+                card:start_materialize()
+                G.GAME.joker_buffer = 0
+                return true
+            end
+        }))
     end
 }

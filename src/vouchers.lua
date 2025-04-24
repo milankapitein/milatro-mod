@@ -56,7 +56,7 @@ SMODS.Voucher{
         return { vars = {} }
     end,
 
-    requires = 'v_mlnc_turbo_v'
+    requires = {'v_mlnc_turbo_v' }
 }
 
 G.FUNCS.reroll_shop = function(e) 
