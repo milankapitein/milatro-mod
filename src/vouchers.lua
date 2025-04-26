@@ -59,6 +59,7 @@ SMODS.Voucher{
     requires = {'v_mlnc_turbo_v' }
 }
 
+--reroll hook
 G.FUNCS.reroll_shop = function(e) 
     stop_use()
     G.CONTROLLER.locks.shop_reroll = true
@@ -122,4 +123,74 @@ G.FUNCS.reroll_shop = function(e)
       end
     }))
     G.E_MANAGER:add_event(Event({ func = function() save_run(); return true end}))
+end
+
+-- Reconstruction
+SMODS.Voucher{
+  key = "reconstruction",
+  atlas = "MilatroMod",
+  pos = { x = 0, y = 0 },
+  loc_txt = {
+    name = "Reconstruction",
+    text = {
+      "Boss Blind size is 175%",
+      "of small blind"
+    }
+  },
+
+  cost = 10,
+
+  unlocked = true,
+  discovered = true,
+
+  loc_vars = function(self, info_queue)
+    return { vars = {} }
+  end,
+
+  redeem = function(self, card)
+    sendTraceMessage("it gets here: ", "reconstruction")
+    for k,v in pairs(G.P_BLINDS) do
+      if G.P_BLINDS[k].boss ~= nil then
+        G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * 0.875
+      end
+    end
   end
+}
+
+SMODS.Voucher{
+  key = "Deconstruction",
+  atlas = "MilatroMod",
+  pos = { x = 0, y = 0 },
+  loc_txt = {
+    name = "Deconstruction",
+    text = {
+      "Boss Blind size is 150%",
+      "of small blind"
+    }
+  },
+
+  cost = 10,
+
+  unlocked = true,
+  discovered = true,
+
+  loc_vars = function(self, info_queue)
+    return { vars = {} }
+  end,
+
+  requires = {'v_mlnc_reconstruction'}
+}
+
+local hook_start_run = Game.start_run
+function Game:start_run()
+  sendTraceMessage("reaches", "init_hook")
+  if G.GAME.used_vouchers.v_mlnc_reconstruction then
+    for k,v in pairs(G.P_BLINDS) do
+      if G.P_BLINDS[k].boss ~= nil then
+        G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * (1/0.875)
+      end
+    end
+  end
+  hook_start_run(self)
+end
+
