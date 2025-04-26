@@ -1,8 +1,8 @@
 SMODS.Atlas {
 	-- Key for code to find it with
-	key = "MilatroMod",
+	key = "MilatroModDecks",
 	-- The name of the file, for the code to pull the atlas from
-	path = "MilatroJokers.png",
+	path = "MilatroDecks.png",
 	-- Width of each sprite in 1x size
 	px = 71,
 	-- Height of each sprite in 1x size
@@ -13,7 +13,7 @@ SMODS.Atlas {
 SMODS.Back {
     name = "Fortune Deck",
     key = "fortune",
-    atlas = "MilatroMod",
+    atlas = "MilatroModDecks",
     pos = { x = 0, y = 0},
     loc_txt = {
         name = "Fortune Deck",
@@ -50,7 +50,7 @@ SMODS.Back {
 SMODS.Back {
     name = "Stacked Deck",
     key = "stacked",
-    atlas = "MilatroMod",
+    atlas = "MilatroModDecks",
     pos = { x = 0, y = 0},
     loc_txt = {
         name = "Stacked Deck",
@@ -103,7 +103,7 @@ SMODS.Back {
 SMODS.Back {
     name = "Space Deck",
     key = "space",
-    atlas = "MilatroMod",
+    atlas = "MilatroModDecks",
     pos = {x = 0, y = 0},
 
     loc_txt = {
@@ -155,7 +155,7 @@ SMODS.Back {
 SMODS.Back {
     name = "Unboxing Deck",
     key = "unboxing",
-    atlas = "MilatroMod",
+    atlas = "MilatroModDecks",
     pos = {x = 0, y = 0},
 
     loc_txt = {
@@ -193,7 +193,7 @@ SMODS.Back {
 SMODS.Back {
     name = "Savings Deck",
     key = "savings",
-    atlas = "MilatroMod",
+    atlas = "MilatroModDecks",
     pos = {x = 0, y = 0},
 
     loc_txt = {
