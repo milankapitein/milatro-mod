@@ -148,7 +148,6 @@ SMODS.Voucher{
   end,
 
   redeem = function(self, card)
-    sendTraceMessage("it gets here: ", "reconstruction")
     for k,v in pairs(G.P_BLINDS) do
       if G.P_BLINDS[k].boss ~= nil then
         G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * 0.875
@@ -157,8 +156,9 @@ SMODS.Voucher{
   end
 }
 
+-- Deconstruction
 SMODS.Voucher{
-  key = "Deconstruction",
+  key = "deconstruction",
   atlas = "MilatroMod",
   pos = { x = 0, y = 0 },
   loc_txt = {
@@ -178,19 +178,32 @@ SMODS.Voucher{
     return { vars = {} }
   end,
 
+  redeem = function(self, card)
+    for k,v in pairs(G.P_BLINDS) do
+      if G.P_BLINDS[k].boss ~= nil then
+        G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * 0.85714285714
+      end
+    end
+  end,
+
   requires = {'v_mlnc_reconstruction'}
 }
 
 local hook_start_run = Game.start_run
-function Game:start_run()
-  sendTraceMessage("reaches", "init_hook")
-  if G.GAME.used_vouchers.v_mlnc_reconstruction then
+function Game:start_run(args)
+  if G.GAME.used_vouchers.v_mlnc_deconstruction then
+    for k,v in pairs(G.P_BLINDS) do
+      if G.P_BLINDS[k].boss ~= nil then
+        G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * (1/0.85714285714) * (1/0.875)
+      end
+    end
+  elseif G.GAME.used_vouchers.v_mlnc_reconstruction then
     for k,v in pairs(G.P_BLINDS) do
       if G.P_BLINDS[k].boss ~= nil then
         G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * (1/0.875)
       end
     end
   end
-  hook_start_run(self)
+  hook_start_run(self, args)
 end
 

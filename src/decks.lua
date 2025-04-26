@@ -231,25 +231,3 @@ SMODS.Back {
         end
     end
 }
-
-SMODS.Back {
-    name = "TEST Deck",
-    key = "test",
-    atlas = "MilatroModDecks",
-    pos = {x = 0, y = 0},
-
-    loc_txt = {
-        name = "TEST Deck",
-        text = {
-            "New voucher"
-        }
-    },
-
-    unlocked = true,
-    discovered = true,
-
-    config = { vouchers = {"v_mlnc_reconstruction"}},
-    loc_vars = function(self, info_queue, center)
-        return { vars = {}}
-    end,
-}
