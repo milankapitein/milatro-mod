@@ -55,3 +55,47 @@ SMODS.Blind{
         return false
     end
 }
+
+-- The Count
+SMODS.Blind{
+    key = 'the_illusion',
+    loc_txt = {
+        name = "The Illusion",
+        text = {
+            "Picks a random,",
+			"non-finisher Boss Blind"
+        }
+    },
+
+    discovered = true,
+    unlocked = true,
+
+    atlas = "MilatroBlinds",
+    pos = {x = 0, y = 0},
+    dollars = 5,
+    mult = 2,
+
+    boss = {min = 3, max = 10},
+    boss_colour = HEX("389396"),
+
+	set_blind = function(self)
+		local length = 0
+		for k,v in pairs(G.P_BLINDS) do 
+			if G.P_BLINDS[k].boss ~= nil and G.P_BLINDS[k].boss.showdown == nil then
+				length = length + 1
+			end
+		end
+
+		sendTraceMessage(tostring(length), "illusion")
+		local selection = pseudorandom("illusion", 1, length)
+
+		local count = 1
+		for k,v in pairs(G.P_BLINDS) do
+			if count == selection then
+				G.GAME.blind:set_blind(G.P_BLINDS[k], false, false)
+				return
+			end
+			count = count + 1
+		end
+	end
+}
