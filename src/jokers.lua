@@ -1686,3 +1686,65 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Impending Doom
+local hook_new_boss = get_new_boss
+function get_new_boss()
+	if (next(SMODS.find_card('j_mlnc_impending_doom'))) and (G.GAME.round_resets.ante % 8) ~= 0 then 
+		for k,v in pairs(G.P_BLINDS) do
+			if G.P_BLINDS[k].name == "bl_mlnc_the_illusion" then
+				return k
+			end
+		end
+	 end
+    return hook_new_boss()
+end
+
+SMODS.Joker{
+	key = 'impending_doom',
+
+	loc_txt = {
+		name = 'Impending Doom',
+		text = {
+			"{C:white,X:mult}X#1# {}Mult,",
+			"All non-finisher blinds are the Illusion"
+		}
+	},
+
+	config = {extra = {Xmult = 3}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.Xmult } }
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	add_to_deck = function(self, card, from_debuff)
+		get_new_boss()
+		G.from_boss_tag = true
+		G.FUNCS.reroll_boss()
+		G.from_boss_tag = false
+	end,
+
+	remove_from_deck = function(self, card, from_debuff)
+		get_new_boss()
+		G.from_boss_tag = true
+		G.FUNCS.reroll_boss()
+		G.from_boss_tag = false
+	end,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				Xmult = card.ability.extra.Xmult,
+			}
+		end
+	end
+}

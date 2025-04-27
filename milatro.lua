@@ -36,7 +36,7 @@ SMODS.Atlas {
 	-- The name of the file, for the code to pull the atlas from
 	path = "tempBlind.png",
 	-- Width of each sprite in 1x size
-	px = 35,
+	px = 34,
 	-- Height of each sprite in 1x size
-	py = 35
+	py = 34
 }

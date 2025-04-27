@@ -56,7 +56,7 @@ SMODS.Blind{
     end
 }
 
--- The Count
+-- The Illusion
 SMODS.Blind{
     key = 'the_illusion',
     loc_txt = {
@@ -76,7 +76,7 @@ SMODS.Blind{
     mult = 2,
 
     boss = {min = 3, max = 10},
-    boss_colour = HEX("389396"),
+    boss_colour = HEX("751e0b"),
 
 	set_blind = function(self)
 		local length = 0
@@ -97,5 +97,33 @@ SMODS.Blind{
 			end
 			count = count + 1
 		end
+	end
+}
+
+-- The Lower
+SMODS.Blind{
+	key = 'the_lower',
+    loc_txt = {
+        name = "The Lower",
+        text = {
+            "Played hand is considerd",
+			"the hand below"
+        }
+    },
+
+    discovered = true,
+    unlocked = true,
+
+    atlas = "MilatroBlinds",
+    pos = {x = 0, y = 0},
+    dollars = 5,
+    mult = 2,
+
+    boss = {min = 2, max = 10},
+    boss_colour = HEX("27cfdb"),
+
+	modify_hand = function(cards, poker_hands, text, mult, hand_chips)
+		-- if poker_hands == "High Card" then sendTraceMessage("hello", "lower") end
+		-- return mult, hand_chips, false
 	end
 }
