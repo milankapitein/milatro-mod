@@ -17,7 +17,7 @@ SMODS.Blind{
     dollars = 5,
     mult = 2,
 
-    boss = {min = 2, max = 10},
+    boss = {min = 1, max = 10},
     boss_colour = HEX("389396"),
 
 
@@ -132,4 +132,110 @@ SMODS.Blind{
 		end	
 		return mult, hand_chips, false
 	end
+}
+
+-- The Wrecker
+SMODS.Blind{
+	key = 'the_wrecker',
+    loc_txt = {
+        name = "The Wrecker",
+        text = {
+            "After each hand, destroy a random",
+			"Joker, card or consumable",
+        }
+    },
+
+    discovered = true,
+    unlocked = true,
+
+    atlas = "MilatroBlinds",
+    pos = {x = 0, y = 0},
+    dollars = 5,
+    mult = 2,
+
+    boss = {min = 4, max = 10},
+    boss_colour = HEX("16960f"),
+
+	drawn_to_hand = function()
+		if G.GAME.current_round.hands_played ~= 0 then
+			local destructable_jokers = {}
+			for i = 1, #G.jokers.cards do
+				if not G.jokers.cards[i].ability.eternal and not G.jokers.cards[i].getting_sliced then destructable_jokers[#destructable_jokers+1] = G.jokers.cards[i] end
+			end
+
+			local val = pseudorandom("wrecker", 0, 10)
+			if val < 4 and #G.consumeables.cards ~= 0 then -- consumable
+				local consumable_to_destroy = #G.consumeables.cards > 0 and pseudorandom_element(G.consumeables.cards, pseudoseed('wrecker_co')) or nil
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						consumable_to_destroy:start_dissolve({ G.C.RED }, nil, 1.6)
+						return true
+					end
+				}))
+			elseif val > 8 and #destructable_jokers ~= 0 then -- joker
+				local joker_to_destroy = #destructable_jokers > 0 and pseudorandom_element(destructable_jokers, pseudoseed('wrecker_j')) or nil
+				joker_to_destroy.getting_sliced = true
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						joker_to_destroy:start_dissolve({ G.C.RED }, nil, 1.6)
+						return true
+					end
+				}))
+			else -- card
+				local card_to_destroy = #G.hand.cards > 0 and pseudorandom_element(G.hand.cards, pseudoseed('wrecker_ca')) or nil
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						card_to_destroy:start_dissolve({ G.C.RED }, nil, 1.6)
+						return true
+					end
+				}))
+			end
+		end
+	end
+}
+
+-- The Brain
+SMODS.Blind{
+	key = 'the_brain',
+    loc_txt = {
+        name = "The Brain",
+        text = {
+            "When Blind is selected,",
+			"leftmost Joker is debuffed",
+        }
+    },
+
+    discovered = true,
+    unlocked = true,
+
+    atlas = "MilatroBlinds",
+    pos = {x = 0, y = 0},
+    dollars = 5,
+    mult = 2,
+
+    boss = {min = 2, max = 10},
+    boss_colour = HEX("7b29ab"),
+
+	set_blind = function(self)
+		if G.jokers.cards[1] then
+			G.jokers.cards[1]:juice_up()
+		end
+	end,
+
+	recalc_debuff = function(self, card, from_blind)
+		return card == G.jokers.cards[1]
+	end
+
+
+	-- disable = function(self)
+	-- 	if G.jokers.cards[1] then
+	-- 		G.jokers.cards[1]:set_debuff(false)
+	-- 	end
+	-- end,
+
+	-- defeat = function(self)
+	-- 	if G.jokers.cards[1] then
+	-- 		G.jokers.cards[1]:set_debuff(false)
+	-- 	end
+	-- end
 }
