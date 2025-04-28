@@ -26,8 +26,7 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				Xmult_mod = card.ability.extra.Xmult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
+				Xmult = card.ability.extra.Xmult,
 			}
 		end
 	end
@@ -117,8 +116,7 @@ SMODS.Joker {
 			local spectral_used = 0
 			for k, v in pairs(G.GAME.consumeable_usage) do if v.set == 'Spectral' then spectral_used = spectral_used + 1 end end
 			return {
-				Xmult_mod = card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain } }
+				Xmult = card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain,
 			}
 		end
 	end
@@ -155,8 +153,7 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				chip_mod = card.ability.extra.chips,
-				message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+				chips = card.ability.extra.chips
 			}
 		end
 		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand] then
@@ -261,8 +258,7 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				mult_mod = card.ability.extra.mult,
-				message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+				mult = card.ability.extra.mult,
 			}
 		end
 		if context.individual and context.cardarea == G.play and context.other_card:get_id() < 0 and not context.blueprint then
@@ -454,7 +450,7 @@ SMODS.Joker {
 	rarity = 1,
 	atlas = 'MilatroMod',
 	pos = { x = 9, y = 0 },
-	cost = 4,
+	cost = 5,
 
 	unlocked = true,
 	discovered = true,
@@ -758,14 +754,12 @@ SMODS.Joker{
 				mult = card.ability.extra.Xmult
 			end
 			return {
-				Xmult_mod = mult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { mult } }
+				Xmult = mult
 			}
 		end
 	end
 }
 
--- TODO: investigate when it perishes, cause i only got 1 planet from 2 blue seals after it perished. it still made a tarot then. i think i fixed it with the not card.debuff
 -- The Reaper
 SMODS.Joker{
 	key = 'the_reaper',
@@ -798,9 +792,10 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before then
+			G.GAME.consumeable_buffer = #G.consumeables.cards
 			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
-		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not card.debuff then
+		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not card.debuff then
 			if pseudorandom('reaper') < G.GAME.probabilities.normal/card.ability.extra.odds then
 				G.E_MANAGER:add_event(Event({
 					func = function()
@@ -819,9 +814,6 @@ SMODS.Joker{
 					message = 'Death waits...'
 				}
 			end
-		end
-		if context.after then
-			G.GAME.consumeable_buffer = 0
 		end
 	end
 }
@@ -859,10 +851,9 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
+			if card.ability.extra.Xmult <= 1 then return end
 			return {
-				--TODO: fix x1 not displaying when lucky cards trigger and joker is at x1 mult q
 				Xmult = card.ability.extra.Xmult,
-				-- message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
 			}
 		end
 		if context.individual and context.cardarea == G.play and not context.blueprint then
@@ -875,7 +866,7 @@ SMODS.Joker{
 				}
 			end
 			if context.other_card.lucky_trigger then
-				if (card.ability.extra.Xmult <= 1.1) then
+				if (card.ability.extra.Xmult < 1.1) then
 					card.ability.extra.Xmult = 1
 					return { 
 						card = card
@@ -1114,7 +1105,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { min = 1, odds = 3}},
+	config = { extra = { min = 1, odds = 2}},
 
 	loc_vars = function(self, info_queue, card)
 		card.ability.extra.min = (G.GAME and G.GAME.probabilities.normal or 1)
@@ -1173,7 +1164,10 @@ SMODS.Joker{
 
 	-- todo: fix granting items :)
 	calculate = function(self, card, context)
-		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+		if context.before then
+			G.GAME.consumeable_buffer = #G.consumeables.cards
+		end
+		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 			local card_type = 'Planet'
 			G.E_MANAGER:add_event(Event({
 				func = (function()
@@ -1191,7 +1185,7 @@ SMODS.Joker{
 					return true
 				end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
             G.E_MANAGER:add_event(Event({
                 func = (function()
                         local card = create_card('Tarot',G.consumeables, nil, nil, nil, nil, nil, '8ba')
@@ -1200,9 +1194,6 @@ SMODS.Joker{
                     return true
                 end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-		end
-		if context.after then
-			G.GAME.consumeable_buffer = 0
 		end
 	end
 }
@@ -1363,8 +1354,7 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main and next(context.poker_hands['Full House']) then
 			return {
-				Xmult_mod = card.ability.extra.Xmult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
+				Xmult = card.ability.extra.Xmult,
 			}
 		end
 	end
@@ -1679,8 +1669,7 @@ SMODS.Joker{
 		if context.joker_main then
 			local jimbos = SMODS.find_card('j_joker')
 			return {
-				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain } }
+				Xmult = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
 			}
 		end
 	end
