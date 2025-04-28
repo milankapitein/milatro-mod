@@ -465,7 +465,7 @@ SMODS.Joker {
 	rarity = 1,
 	atlas = 'MilatroMod',
 	pos = { x = 9, y = 0 },
-	cost = 4,
+	cost = 5,
 
 	unlocked = true,
 	discovered = true,
@@ -777,7 +777,6 @@ SMODS.Joker{
 	end
 }
 
--- TODO: investigate when it perishes, cause i only got 1 planet from 2 blue seals after it perished. it still made a tarot then. i think i fixed it with the not card.debuff
 -- The Reaper
 SMODS.Joker{
 	key = 'the_reaper',
@@ -861,7 +860,7 @@ SMODS.Joker{
 	rarity = 2,
 	atlas = 'MilatroMod',
 	pos = { x = 6, y = 1 },
-	cost = 4,
+	cost = 6,
 
 	unlocked = true,
 	discovered = true,
@@ -1125,7 +1124,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { min = 1, odds = 3}},
+	config = { extra = { min = 1, odds = 2}},
 
 	loc_vars = function(self, info_queue, card)
 		card.ability.extra.min = (G.GAME and G.GAME.probabilities.normal or 1)
