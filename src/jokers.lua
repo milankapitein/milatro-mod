@@ -1772,3 +1772,179 @@ SMODS.Joker{
 		end
 	end
 }
+
+--You're The Joker
+SMODS.Joker{
+	key = 'youre_the_joker',
+
+	loc_txt = {
+		name = 'You\'re the Joker',
+		text = {
+			"Selling any item has a",
+			"{C:green}#1# in #2#{} odds to",
+			"create a {C:tarot}Fool{}"
+		}
+	},
+
+	config = { extra = { base = 1, odds = 3}},
+
+	loc_vars = function(self, info_queue, card)
+		card.ability.extra.base = (G.GAME and G.GAME.probabilities.normal or 1)
+		info_queue[#info_queue+1] = G.P_CENTERS.c_fool
+		return { vars = {card.ability.extra.base, card.ability.extra.odds}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.selling_card and not context.selling_self then
+			if pseudorandom('youre_the_joker') < G.GAME.probabilities.normal/card.ability.extra.odds and #G.consumeables.cards <= G.consumeables.config.card_limit then
+			-- TODO: make sure that if a negative consumable is sold, it doenst create another fool as this would make it go over the limit
+			-- also fix blueprint and selling youre the joker when it's being copied
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_fool')
+					card:add_to_deck()
+					G.consumeables:emplace(card)
+					return true
+				end
+			}))
+			return{
+				message = "HAHA!"
+			}
+			end
+		end
+	end
+}
+
+--Backpack
+SMODS.Joker{
+	key = 'backpack',
+
+	loc_txt = {
+		name = 'Backpack',
+		text = {
+			"{C:mult}+#1#{} Mult for each filled",
+			"consumable slot",
+			"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = {mult_gain = 10, mult = 0}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain * #G.consumeables.cards}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function (self, card, context)
+		if context.joker_main then
+			return {
+				mult = card.ability.extra.mult_gain * #G.consumeables.cards
+			}
+		end
+	end
+
+}
+
+--Expanding Joker
+SMODS.Joker{
+	key = 'expanding_joker',
+
+	loc_txt = {
+		name = 'Expanding Joker',
+		text = {
+			"{C:mult}+#1#{} Mult for each card",
+			"in deck over standard deck size",
+			"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = { mult_gain = 1, mult = 0}},
+
+	loc_vars = function(self, info_queue, card)
+		-- TODO: make it so negatives don't count
+		local mult = #G.playing_cards - G.GAME.starting_deck_size
+		if mult < 0 then mult = 0 end
+		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain*mult}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local mult = #G.playing_cards - G.GAME.starting_deck_size
+			if mult < 0 then mult = 0 end
+			return {
+				mult = mult
+			}
+		end
+	end
+}
+
+--Snack Joker
+SMODS.Joker{
+	key = 'snack_joker',
+
+	loc_txt = {
+		name = 'Snack Joker',
+		text = {
+			"{C:chips}+#1#{} Chips when any",
+			"consumable is used",
+			"{C:inactive}(Currently {C:chips}#2#{C:inactive} Chips)"
+
+		}
+	},
+
+	config = { extra = {chip_gain = 2, chip = 0}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.chip_gain, card.ability.extra.chip} }
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.using_consumeable and not context.blueprint then
+			card.ability.extra.chip = card.ability.extra.chip_gain + card.ability.extra.chip
+			return {
+				message = localize('k_upgrade_ex'),
+				card = card
+			}
+		end
+		if context.joker_main then
+			return {
+				chips = card.ability.extra.chip
+			}
+		end
+	end
+}
