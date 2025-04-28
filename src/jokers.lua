@@ -37,8 +37,7 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				Xmult_mod = card.ability.extra.Xmult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
+				Xmult = card.ability.extra.Xmult,
 			}
 		end
 	end
@@ -128,8 +127,7 @@ SMODS.Joker {
 			local spectral_used = 0
 			for k, v in pairs(G.GAME.consumeable_usage) do if v.set == 'Spectral' then spectral_used = spectral_used + 1 end end
 			return {
-				Xmult_mod = card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain } }
+				Xmult = card.ability.extra.Xmult + spectral_used * card.ability.extra.Xmult_gain,
 			}
 		end
 	end
@@ -166,8 +164,7 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				chip_mod = card.ability.extra.chips,
-				message = localize { type = 'variable', key = 'a_chips', vars = { card.ability.extra.chips } }
+				chips = card.ability.extra.chips
 			}
 		end
 		if context.discard and not context.blueprint and context.other_card == context.full_hand[#context.full_hand] then
@@ -272,8 +269,7 @@ SMODS.Joker {
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				mult_mod = card.ability.extra.mult,
-				message = localize { type = 'variable', key = 'a_mult', vars = { card.ability.extra.mult } }
+				mult = card.ability.extra.mult,
 			}
 		end
 		if context.individual and context.cardarea == G.play and context.other_card:get_id() < 0 and not context.blueprint then
@@ -733,7 +729,6 @@ SMODS.Joker{
 	loc_vars = function(self, info_queue, card)
 		card.ability.extra.compareNum = 0
 		if SMODS.find_mod('Talisman') == nil then
-			sendTraceMessage(tostring(SMODS.Mods['Talisman']),"loanshark")
 			card.ability.extra.compareNum = to_big(0)
 		end
 		if G.GAME.dollars < card.ability.extra.compareNum then
@@ -770,8 +765,7 @@ SMODS.Joker{
 				mult = card.ability.extra.Xmult
 			end
 			return {
-				Xmult_mod = mult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { mult } }
+				Xmult = mult
 			}
 		end
 	end
@@ -822,7 +816,6 @@ SMODS.Joker{
 						return true
 					end
 				}))
-				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro_thereaper")
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 				return{
 					message = 'Death comes...'
@@ -869,10 +862,9 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
+			if card.ability.extra.Xmult <= 1 then return end
 			return {
-				--TODO: fix x1 not displaying when lucky cards trigger and joker is at x1 mult q
 				Xmult = card.ability.extra.Xmult,
-				-- message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
 			}
 		end
 		if context.individual and context.cardarea == G.play and not context.blueprint then
@@ -885,7 +877,7 @@ SMODS.Joker{
 				}
 			end
 			if context.other_card.lucky_trigger then
-				if (card.ability.extra.Xmult <= 1.1) then
+				if (card.ability.extra.Xmult < 1.1) then
 					card.ability.extra.Xmult = 1
 					return { 
 						card = card
@@ -1183,7 +1175,7 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before then
-			G.GAME.consumeable_buffer = #G.consumeables.cards 
+			G.GAME.consumeable_buffer = #G.consumeables.cards
 		end
 		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 			local card_type = 'Planet'
@@ -1203,7 +1195,6 @@ SMODS.Joker{
 					return true
 				end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro_mh_blue")
 		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
             G.E_MANAGER:add_event(Event({
                 func = (function()
@@ -1213,7 +1204,6 @@ SMODS.Joker{
                     return true
                 end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro_mh_purple")
 		end
 	end
 }
@@ -1374,8 +1364,7 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main and next(context.poker_hands['Full House']) then
 			return {
-				Xmult_mod = card.ability.extra.Xmult,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult } }
+				Xmult = card.ability.extra.Xmult,
 			}
 		end
 	end
@@ -1624,7 +1613,6 @@ SMODS.Joker{
 		end
 
 		if not context.blueprint and context.destroying_card then
-			sendTraceMessage("gets here", "hhungry")
 			for i = 1, #context.scoring_hand do 
 				if context.scoring_hand[i]:get_id() == 9 and card.ability.extra.contains7 then
 					G.E_MANAGER:add_event(Event({
@@ -1691,8 +1679,7 @@ SMODS.Joker{
 		if context.joker_main then
 			local jimbos = SMODS.find_card('j_joker')
 			return {
-				Xmult_mod = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
-				message = localize { type = 'variable', key = 'a_xmult', vars = { card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain } }
+				Xmult = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
 			}
 		end
 	end
