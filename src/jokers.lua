@@ -810,9 +810,10 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before then
+			G.GAME.consumeable_buffer = #G.consumeables.cards
 			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
-		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards and not card.debuff then
+		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not card.debuff then
 			if pseudorandom('reaper') < G.GAME.probabilities.normal/card.ability.extra.odds then
 				G.E_MANAGER:add_event(Event({
 					func = function()
@@ -822,6 +823,7 @@ SMODS.Joker{
 						return true
 					end
 				}))
+				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro_thereaper")
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
 				return{
 					message = 'Death comes...'
@@ -831,9 +833,6 @@ SMODS.Joker{
 					message = 'Death waits...'
 				}
 			end
-		end
-		if context.after then
-			G.GAME.consumeable_buffer = 0
 		end
 	end
 }
@@ -1184,7 +1183,10 @@ SMODS.Joker{
 	blueprint_compat = true,
 
 	calculate = function(self, card, context)
-		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+		if context.before then
+			G.GAME.consumeable_buffer = #G.consumeables.cards 
+		end
+		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 			local card_type = 'Planet'
 			G.E_MANAGER:add_event(Event({
 				func = (function()
@@ -1202,7 +1204,8 @@ SMODS.Joker{
 					return true
 				end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro_mh_blue")
+		elseif context.individual and context.cardarea == G.play and context.other_card.seal == 'Purple' and G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
             G.E_MANAGER:add_event(Event({
                 func = (function()
                         local card = create_card('Tarot',G.consumeables, nil, nil, nil, nil, nil, '8ba')
@@ -1211,9 +1214,7 @@ SMODS.Joker{
                     return true
                 end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
-		end
-		if context.after then
-			G.GAME.consumeable_buffer = 0
+				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro_mh_purple")
 		end
 	end
 }
