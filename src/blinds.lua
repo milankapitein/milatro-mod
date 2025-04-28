@@ -122,8 +122,14 @@ SMODS.Blind{
     boss = {min = 2, max = 10},
     boss_colour = HEX("27cfdb"),
 
-	modify_hand = function(cards, poker_hands, text, mult, hand_chips)
-		-- if poker_hands == "High Card" then sendTraceMessage("hello", "lower") end
-		-- return mult, hand_chips, false
+	modify_hand = function(self, cards, poker_hands, text, mult, hand_chips)
+		if text == "High Card" then return mult, hand_chips, false end
+		for i = 1, #G.handlist do
+			if text == G.handlist[i] then
+				local new_hand = G.handlist[i + 1]
+				return G.GAME.hands[new_hand].mult, G.GAME.hands[new_hand].chips, true
+			end
+		end	
+		return mult, hand_chips, false
 	end
 }

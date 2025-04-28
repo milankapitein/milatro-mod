@@ -722,7 +722,6 @@ SMODS.Joker{
 	loc_vars = function(self, info_queue, card)
 		card.ability.extra.compareNum = 0
 		if SMODS.find_mod('Talisman') == nil then
-			sendTraceMessage(tostring(SMODS.Mods['Talisman']),"loanshark")
 			card.ability.extra.compareNum = to_big(0)
 		end
 		if G.GAME.dollars < card.ability.extra.compareNum then
@@ -801,7 +800,7 @@ SMODS.Joker{
 		if context.before then
 			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
-		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.consumeables.config.card_limit > #G.consumeables.cards and not card.debuff then
+		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not card.debuff then
 			if pseudorandom('reaper') < G.GAME.probabilities.normal/card.ability.extra.odds then
 				G.E_MANAGER:add_event(Event({
 					func = function()
@@ -851,7 +850,7 @@ SMODS.Joker{
 	rarity = 2,
 	atlas = 'MilatroMod',
 	pos = { x = 6, y = 1 },
-	cost = 4,
+	cost = 6,
 
 	unlocked = true,
 	discovered = true,
@@ -1172,6 +1171,7 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = true,
 
+	-- todo: fix granting items :)
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play and context.other_card.seal == 'Blue' and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
 			local card_type = 'Planet'
@@ -1613,7 +1613,6 @@ SMODS.Joker{
 		end
 
 		if not context.blueprint and context.destroying_card then
-			sendTraceMessage("gets here", "hhungry")
 			for i = 1, #context.scoring_hand do 
 				if context.scoring_hand[i]:get_id() == 9 and card.ability.extra.contains7 then
 					G.E_MANAGER:add_event(Event({
@@ -1707,7 +1706,7 @@ SMODS.Joker{
 		name = 'Impending Doom',
 		text = {
 			"{C:white,X:mult}X#1# {}Mult,",
-			"All non-finisher blinds are the Illusion"
+			"All non-finisher boss blinds are the Illusion"
 		}
 	},
 
@@ -1730,14 +1729,12 @@ SMODS.Joker{
 		get_new_boss()
 		G.from_boss_tag = true
 		G.FUNCS.reroll_boss()
-		G.from_boss_tag = false
 	end,
 
 	remove_from_deck = function(self, card, from_debuff)
 		get_new_boss()
 		G.from_boss_tag = true
 		G.FUNCS.reroll_boss()
-		G.from_boss_tag = false
 	end,
 
 	calculate = function(self, card, context)
@@ -1745,6 +1742,44 @@ SMODS.Joker{
 			return {
 				Xmult = card.ability.extra.Xmult,
 			}
+		end
+	end
+}
+
+--Bluffing
+SMODS.Joker{
+	key = 'bluffing',
+
+	loc_txt = {
+		name = 'Bluffing',
+		text = {
+			"Played hand is considered",
+			"the hand above it",
+			"{C:inactive}(Ex: Flush -> Full House){}"
+		}
+	},
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 9,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play and context.other_card == context.scoring_hand[1] and not context.blueprint then
+			for i = 1, #G.handlist do
+				if context.scoring_name == G.handlist[i] then
+					local new_hand = G.handlist[i - 1]
+					return {
+						mult_mod = G.GAME.hands[new_hand].mult - G.GAME.hands[G.handlist[i]].mult,
+						chip_mod = G.GAME.hands[new_hand].chips - G.GAME.hands[G.handlist[i]].chips,
+						message = "Bluffed"
+					}
+				end
+			end
 		end
 	end
 }
