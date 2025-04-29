@@ -1824,6 +1824,17 @@ SMODS.Joker{
 	end
 }
 
+function get_backpack_count()
+	local count = 0
+	if G.consumeables == nil then
+		return count
+	else
+		for k, v in pairs(G.consumeables.cards) do
+			if (v ~= nil) and (v.edition == nil or not v.edition.negative) then count = count + 1 end
+		end
+	end
+	return count
+end
 --Backpack
 SMODS.Joker{
 	key = 'backpack',
@@ -1840,14 +1851,7 @@ SMODS.Joker{
 	config = { extra = {mult_gain = 10, mult = 0}},
 
 	loc_vars = function(self, info_queue, card)
-		local count = 0
-		if G.consumeables == nil then count = 0 
-		else 
-			for k, v in pairs(G.consumeables.cards) do
-				if (v ~= nil) and (v.edition == nil or not v.edition.negative) then count = count + 1 end
-			end
-		end
-		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain *count}}
+		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain * get_backpack_count()}}
 	end,
 
 	rarity = 1,
@@ -1862,7 +1866,7 @@ SMODS.Joker{
 	calculate = function (self, card, context)
 		if context.joker_main then
 			return {
-				mult = card.ability.extra.mult_gain * #G.consumeables.cards
+				mult = card.ability.extra.mult_gain * get_backpack_count()
 			}
 		end
 	end
