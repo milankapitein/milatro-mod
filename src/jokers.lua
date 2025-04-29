@@ -1840,7 +1840,14 @@ SMODS.Joker{
 	config = { extra = {mult_gain = 10, mult = 0}},
 
 	loc_vars = function(self, info_queue, card)
-		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain * #G.consumeables.cards}}
+		local count = 0
+		if G.consumeables == nil then count = 0 
+		else 
+			for k, v in pairs(G.consumeables.cards) do
+				if (v ~= nil) and (v.edition == nil or not v.edition.negative) then count = count + 1 end
+			end
+		end
+		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain *count}}
 	end,
 
 	rarity = 1,
@@ -1878,8 +1885,11 @@ SMODS.Joker{
 	config = { extra = { mult_gain = 1, mult = 0}},
 
 	loc_vars = function(self, info_queue, card)
-		-- TODO: make it so negatives don't count
-		local mult = #G.playing_cards - G.GAME.starting_deck_size
+		local mult = 0
+		if G.playing_cards == nil then mult = 0 
+		else
+		mult = #G.playing_cards - G.GAME.starting_deck_size
+		end
 		if mult < 0 then mult = 0 end
 		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult_gain*mult}}
 	end,
