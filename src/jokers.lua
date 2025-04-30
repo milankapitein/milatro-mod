@@ -1695,6 +1695,8 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = true,
 
+	perishable_compat = false, 
+
 	add_to_deck = function(self, card, from_debuff)
 		get_new_boss()
 		G.from_boss_tag = true
@@ -1792,8 +1794,7 @@ SMODS.Joker{
 			if pseudorandom('youre_the_joker') < G.GAME.probabilities.normal/card.ability.extra.odds and 
 			(#G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit or (#G.consumeables.cards +  G.GAME.consumeable_buffer <= G.consumeables.config.card_limit and context.card.ability.set ~= "Joker")) then
 			-- is negative consumable at limit check 
-			if context.card.edition ~= nil and context.card.edition.negative and context.card.ability.set ~= "Joker" and #G.consumeables.cards + G.GAME.consumeable_buffer == G.consumeables.config.card_limit then 
-				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatroYTJ")
+			if context.card.edition ~= nil and context.card.edition.negative and context.card.ability.set ~= "Joker" and #G.consumeables.cards + G.GAME.consumeable_buffer == G.consumeables.config.card_limit then
 				return
 			end
 			G.GAME.consumeable_buffer =  G.GAME.consumeable_buffer + 1
@@ -1813,7 +1814,6 @@ SMODS.Joker{
 		end
 	end
 }
-
 
 --Backpack
 function get_backpack_count()
@@ -1937,6 +1937,8 @@ SMODS.Joker{
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+
+	perishable_compat = false,
 
 	calculate = function(self, card, context)
 		if context.using_consumeable and not context.blueprint then
@@ -2065,3 +2067,149 @@ SMODS.Joker{
 	end
 }
 
+-- Gremlin Joker
+SMODS.Joker{
+	key = 'gremlin_joker',
+
+	loc_txt = {
+		name = 'Gremlin Joker',
+		text = {
+			"{C:green}#2# in #1#{} chance for {C:mult}+#4#{} Mult",
+			"{C:green}#3# in #1#{} chance for {C:mult}#5#{} Mult",
+			"Odds cannot be changed"
+		}
+	},
+
+	config = { extra = { max = 5, good_chance = 4, bad_chance = 1, p_mult = 25, m_mult = -20}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.max, card.ability.extra.good_chance, card.ability.extra.bad_chance, card.ability.extra.p_mult, card.ability.extra.m_mult}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			if pseudorandom("gremlin", 1, card.ability.extra.max) <= 1 then
+				return {
+					mult = card.ability.extra.m_mult
+				}
+			else
+				return {
+					mult = card.ability.extra.p_mult
+				}
+			end
+		end
+	end,
+}
+
+-- Forbidden Fruit
+SMODS.Joker{
+	key = 'forbidden_fruit',
+
+	loc_txt = {
+		name = 'Forbidden Fruit',
+		text = {
+			"Playing a {C:attention}#1# {}of",
+			"{V:1}#2#{} fills all consumable slots",
+			"with {C:tarot}Judgements{}",
+			"Card changes each round"
+		}
+	},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.c_judgement
+		return { vars = {localize(G.GAME.current_round.idol_card.rank, 'ranks'), localize(G.GAME.current_round.idol_card.suit, 'suits_plural'), colours = { G.C.SUITS[G.GAME.current_round.idol_card.suit] }}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	calculate = function (self, card, context)
+		if context.individual and context.cardarea == G.play and not context.blueprint then	
+			if context.other_card:get_id() == G.GAME.current_round.idol_card.id and context.other_card:is_suit(G.GAME.current_round.idol_card.suit) 
+			and #G.consumeables.cards < G.consumeables.config.card_limit then
+				for i = 1, (G.consumeables.config.card_limit - #G.consumeables.cards) do
+					G.E_MANAGER:add_event(Event({
+						func = function()
+							card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_judgement')
+							card:add_to_deck()
+							G.consumeables:emplace(card)
+							return true
+						end
+					}))
+				end
+				return {
+					message = "Judged...",
+					card = card
+				}
+			end
+		end
+	end
+}
+
+-- Five Day Stay
+SMODS.Joker{
+	key = 'five_day_stay',
+
+	loc_txt = {
+		name = 'Five Day Stay',
+		text = {
+			"Gains {C:white,X:mult}X#1#{} Mult for",
+			"each scored {C:attention}5{}",
+			"This Joker stops scaling after {C:attention}#2#{} rounds",
+			"{C:inactive}(Currently {C:white,X:mult}X#3#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = {mult_gain = 0.1, rounds = 5, xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.mult_gain, card.ability.extra.rounds, card.ability.extra.xmult }}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	perishable_compat = false,
+
+	calculate = function(self, card, context)
+		if context.end_of_round and not context.blueprint and card.ability.extra.rounds > 0 and not context.individual and not context.repetition then
+			card.ability.extra.rounds = card.ability.extra.rounds - 1
+			return {
+				message = "-1 round"
+			}
+		end
+		if context.individual and context.cardarea == G.play and context.other_card:get_id() == 5 and card.ability.extra.rounds > 0 and not context.blueprint then
+			card.ability.extra.xmult = card.ability.extra.xmult + card.ability.extra.mult_gain
+			return {
+				message = localize('k_upgrade_ex'),
+				card = card
+			}
+		end
+		if context.joker_main then
+			return {
+				xmult = card.ability.extra.xmult
+			}
+		end
+	end
+}

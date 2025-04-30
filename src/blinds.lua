@@ -86,7 +86,6 @@ SMODS.Blind{
 			end
 		end
 
-		sendTraceMessage(tostring(length), "illusion")
 		local selection = pseudorandom("illusion", 1, length)
 
 		local count = 1
