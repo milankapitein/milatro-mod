@@ -63,3 +63,9 @@ get_suits_count = function(context)
 	end
 	return suits
 end
+
+get_table_size = function(table)
+	count = 0
+	for _ in pairs(table) do count = count + 1 end
+	return count
+end

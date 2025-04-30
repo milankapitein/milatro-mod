@@ -40,7 +40,7 @@ SMODS.Back {
     name = "Stacked Deck",
     key = "stacked",
     atlas = "MilatroModDecks",
-    pos = { x = 0, y = 0},
+    pos = { x = 1, y = 0},
     loc_txt = {
         name = "Stacked Deck",
         text = {
@@ -93,7 +93,7 @@ SMODS.Back {
     name = "Space Deck",
     key = "space",
     atlas = "MilatroModDecks",
-    pos = {x = 0, y = 0},
+    pos = {x = 2, y = 0},
 
     loc_txt = {
         name = "Space Deck",
@@ -141,6 +141,7 @@ SMODS.Back {
 }
 
 -- Unboxing Deck
+-- art idea: cardboard like vagabond with tape and this side up sticker. also maybe packaging label idk
 SMODS.Back {
     name = "Unboxing Deck",
     key = "unboxing",

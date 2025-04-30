@@ -313,7 +313,6 @@ SMODS.Joker {
 
 
 -- Colorblindness
--- inspired by https://github.com/TheOneGoofAli/TOGAPackBalatro/blob/20a4d9d2d930cb22daa22c01930aaafb67656daf/togastuff.lua#L211-L242
 local original_card_is_suit = Card.is_suit
 function Card:is_suit(suit, bypass_debuff, flush_calc)
 	if flush_calc then
@@ -1668,14 +1667,13 @@ function get_new_boss()
 	 end
     return hook_new_boss()
 end
-
 SMODS.Joker{
 	key = 'impending_doom',
 
 	loc_txt = {
 		name = 'Impending Doom',
 		text = {
-			"{C:white,X:mult}X#1# {}Mult,",
+			"{C:white,X:mult}X#1#{} Mult,",
 			"All non-finisher boss blinds are the Illusion"
 		}
 	},
@@ -2210,6 +2208,124 @@ SMODS.Joker{
 			return {
 				xmult = card.ability.extra.xmult
 			}
+		end
+	end
+}
+
+-- Pear
+SMODS.Joker{
+	key = 'pear',
+
+	loc_txt = {
+		name = 'Pear',
+		text = {
+			"Gains {C:chips}+#1#{} chips if hand is a {C:attention}Pair{}",
+			"{C:chips}-#1#{} chips does not contain a {C:attention}Pair{}",
+			"{C:inactive}(Currently {C:chips}#2#{C:inactive} chips)"
+		}
+	},
+
+	config = { extra = { chip_change = 5, chips = 50}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = { card.ability.extra.chip_change, card.ability.extra.chips}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.before then
+			if context.scoring_name == 'Pair' then
+				card.ability.extra.chips = card.ability.extra.chips + card.ability.extra.chip_change
+				return {
+					message = localize('k_upgrade_ex'),
+					card = card
+				}
+			elseif not next(context.poker_hands['Pair']) then
+				card.ability.extra.chips = card.ability.extra.chips - card.ability.extra.chip_change
+				return {
+					message = localize{type='variable',key='a_chips_minus',vars={ card.ability.extra.chip_change}},
+                    colour = G.C.CHIPS
+				}
+			end
+		end
+		if context.joker_main then
+			return {
+				chips = card.ability.extra.chips
+			}
+		end
+	end
+}
+
+-- Lootbox
+SMODS.Joker{
+	key = 'lootbox',
+
+	loc_txt = {
+		name = 'Lootbox',
+		text = {
+			"Create {C:attention}#1#{} random {C:attention}Tag#3#{}",
+			"when this Joker is sold",
+			"Increases by {C:attention}#2#{} every round this",
+			"Joker is held"
+		}
+	},
+
+	config = { extra = { count = 0, gain = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		local text = ''
+		if card.ability.extra.count >= 2 then
+			text = 's'
+		end
+		return { vars = {card.ability.extra.count, card.ability.extra.gain, text}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	eternal_compat = false,
+	perishable_compat = false,
+
+	calculate = function(self, card, context)
+		if context.end_of_round and not context.blueprint and not context.individual and not context.repetition then
+			card.ability.extra.count = card.ability.extra.count + card.ability.extra.gain
+			return {
+				message = localize('k_upgrade_ex')
+			}
+		end
+		if context.selling_self then
+			local len = get_table_size(G.P_TAGS)
+			for i = 1, card.ability.extra.count do
+				local count = 1
+				local random = pseudorandom(pseudoseed("lootbox"), 1, len)
+				for k in pairs(G.P_TAGS) do
+					if count == random then
+						G.E_MANAGER:add_event(Event({
+						func = (function()
+							add_tag(Tag(k))
+							play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+							play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+							return true
+						end)
+						}))	
+					end
+					count = count + 1
+				end	
+			end
 		end
 	end
 }
