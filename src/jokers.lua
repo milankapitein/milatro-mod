@@ -1786,7 +1786,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = { base = 1, odds = 3}},
+	config = { extra = { base = 1, odds = 3, lock = false}},
 
 	loc_vars = function(self, info_queue, card)
 		card.ability.extra.base = (G.GAME and G.GAME.probabilities.normal or 1)
@@ -1804,15 +1804,25 @@ SMODS.Joker{
 	blueprint_compat = true,
 
 	calculate = function(self, card, context)
-		if context.selling_card and not context.selling_self then
-			if pseudorandom('youre_the_joker') < G.GAME.probabilities.normal/card.ability.extra.odds and #G.consumeables.cards <= G.consumeables.config.card_limit then
-			-- TODO: make sure that if a negative consumable is sold, it doenst create another fool as this would make it go over the limit
-			-- also fix blueprint and selling youre the joker when it's being copied
+		if context.selling_self then
+			card.ability.extra.lock = true -- jank solution cause adding not context.selling_self to the other if statement still made it make a fool????
+		end
+		-- fix blueprint compat
+		if context.selling_card and not card.ability.extra.lock then
+			if pseudorandom('youre_the_joker') < G.GAME.probabilities.normal/card.ability.extra.odds and 
+			(#G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit or (#G.consumeables.cards +  G.GAME.consumeable_buffer <= G.consumeables.config.card_limit and context.card.ability.set ~= "Joker")) then
+			-- is negative consumable at limit check 
+			if context.card.edition ~= nil and context.card.edition.negative and context.card.ability.set ~= "Joker" and #G.consumeables.cards + G.GAME.consumeable_buffer == G.consumeables.config.card_limit then 
+				sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatroYTJ")
+				return
+			end
+			G.GAME.consumeable_buffer =  G.GAME.consumeable_buffer + 1
 			G.E_MANAGER:add_event(Event({
 				func = function()
 					card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_fool')
 					card:add_to_deck()
 					G.consumeables:emplace(card)
+					G.GAME.consumeable_buffer = 0
 					return true
 				end
 			}))
@@ -1824,6 +1834,8 @@ SMODS.Joker{
 	end
 }
 
+
+--Backpack
 function get_backpack_count()
 	local count = 0
 	if G.consumeables == nil then
@@ -1835,7 +1847,6 @@ function get_backpack_count()
 	end
 	return count
 end
---Backpack
 SMODS.Joker{
 	key = 'backpack',
 
