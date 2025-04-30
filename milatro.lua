@@ -40,3 +40,26 @@ SMODS.Atlas {
 	-- Height of each sprite in 1x size
 	py = 34
 }
+
+get_suits_count = function(context)
+	local suits = {
+		['Hearts'] = 0,
+		['Diamonds'] = 0,
+		['Spades'] = 0,
+		['Clubs'] = 0
+	}
+	for i = 1, #context.full_hand do
+		if context.full_hand[i].ability.name ~= 'Wild Card' then
+			if context.full_hand[i]:is_suit('Hearts', true) then
+				suits["Hearts"] = suits["Hearts"] + 1
+			elseif context.full_hand[i]:is_suit('Diamonds', true) then
+				suits["Diamonds"] = suits["Diamonds"] + 1
+			elseif context.full_hand[i]:is_suit('Spades', true) then
+				suits["Spades"] = suits["Spades"] + 1
+			elseif context.full_hand[i]:is_suit('Clubs', true) then
+				suits["Clubs"] = suits["Clubs"] + 1
+			end
+		end
+	end
+	return suits
+end

@@ -458,25 +458,7 @@ SMODS.Joker {
 
 	calculate = function(self, card, context)
 		if context.joker_main then
-			local suits = {
-				['Hearts'] = 0,
-				['Diamonds'] = 0,
-				['Spades'] = 0,
-				['Clubs'] = 0
-			}
-			for i = 1, #context.full_hand do
-				if context.full_hand[i].ability.name ~= 'Wild Card' then
-					if context.full_hand[i]:is_suit('Hearts', true) then
-						suits["Hearts"] = suits["Hearts"] + 1
-					elseif context.full_hand[i]:is_suit('Diamonds', true) then
-						suits["Diamonds"] = suits["Diamonds"] + 1
-					elseif context.full_hand[i]:is_suit('Spades', true) then
-						suits["Spades"] = suits["Spades"] + 1
-					elseif context.full_hand[i]:is_suit('Clubs', true) then
-						suits["Clubs"] = suits["Clubs"] + 1
-					end
-				end
-			end
+			local suits = get_suits_count(context)
 			if suits["Clubs"] <= 0 and suits["Spades"] <= 0 then
 				return {
 					mult = card.ability.extra.mult,
@@ -1198,7 +1180,6 @@ SMODS.Joker{
 	end
 }
 
-
 -- Phalanx
 function Card:set_debuff(should_debuff)
 	if(next(SMODS.find_card('j_mlnc_phalanx'))) then
@@ -1807,7 +1788,6 @@ SMODS.Joker{
 		if context.selling_self then
 			card.ability.extra.lock = true -- jank solution cause adding not context.selling_self to the other if statement still made it make a fool????
 		end
-		-- fix blueprint compat
 		if context.selling_card and not card.ability.extra.lock then
 			if pseudorandom('youre_the_joker') < G.GAME.probabilities.normal/card.ability.extra.odds and 
 			(#G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit or (#G.consumeables.cards +  G.GAME.consumeable_buffer <= G.consumeables.config.card_limit and context.card.ability.set ~= "Joker")) then
@@ -1973,3 +1953,115 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Cupid Arrow
+SMODS.Joker{
+	key = 'cupid_arrow',
+
+	loc_txt = {
+		name = 'Cupid Arrow',
+		text = {
+			"If hand contains only {V:2}Hearts{},",
+			"create a {C:tarot}Lovers{}"
+		}
+	},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.c_lovers
+		return {
+			vars = {
+				"Spade",
+				"Heart",
+				"Club",
+				"Diamond",
+				colours = {
+					G.C.SUITS.Spades,
+					G.C.SUITS.Hearts,
+					G.C.SUITS.Clubs,
+					G.C.SUITS.Diamonds
+				}
+			}
+		}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local suits = get_suits_count(context)
+			if suits['Diamonds'] == 0 and suits['Clubs'] == 0 and suits['Spades'] == 0 and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_lovers')
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+						G.GAME.consumeable_buffer = 0
+						return true
+					end
+				}))
+				return {
+					message = "LOVE"
+				}
+			end
+		end
+	end
+}
+
+-- Hit the Gym
+SMODS.Joker{
+	key = 'hit_the_gym',
+
+	loc_txt = {
+		name = 'Hit the Gym',
+		text = {
+			"If hand contains a scoring {C:attention}Jack{},",
+			"create a {C:tarot}Strength{}"
+		}
+	},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.c_strength
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 9,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local contains_jack = false
+			for i = 1, #context.scoring_hand do
+				if context.scoring_hand[i]:get_id() == 11 then contains_jack = true end
+			end
+			if contains_jack and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_strength')
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+						G.GAME.consumeable_buffer = 0
+						return true
+					end
+				}))
+				return {
+					message = "Gains"
+				}
+			end
+		end
+	end
+}
+
