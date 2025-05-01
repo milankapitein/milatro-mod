@@ -8,7 +8,7 @@ SMODS.Back {
         name = "Fortune Deck",
         text = {
             "Start in Ante 2. All",
-            "cards are {C:attention,T:m_lucky}Lucky{} cards."
+            "cards are {C:attention,T:m_lucky}Lucky{} cards"
         }
     },
 
@@ -46,7 +46,7 @@ SMODS.Back {
         text = {
             "Start a run with{C:attention} 2, 3, 4{} and {C:attention}5{}",
             "replaced with {C:attention}Jack, Queen,{}",
-            "{C:attention}King{} and {C:attention}Ace{}."
+            "{C:attention}King{} and {C:attention}Ace{}"
         }
     },
 
@@ -141,12 +141,11 @@ SMODS.Back {
 }
 
 -- Unboxing Deck
--- art idea: cardboard like vagabond with tape and this side up sticker. also maybe packaging label idk
 SMODS.Back {
     name = "Unboxing Deck",
     key = "unboxing",
     atlas = "MilatroModDecks",
-    pos = {x = 0, y = 0},
+    pos = {x = 3, y = 0},
 
     loc_txt = {
         name = "Unboxing Deck",
@@ -191,8 +190,9 @@ SMODS.Back {
         text = {
             "Start run with",
             "{C:money,T:v_seed_money}Seed Money{}, {C:money,T:v_money_tree}Money Tree{}",
-            "and {T:c_hermit,C:tarot}Hermit{}. Extra {C:blue}hands{}",
-            "earn no extra money"
+            "and {T:c_hermit,C:tarot}Hermit{}",
+            "Extra {C:blue}hands{} earn",
+            "no extra money"
         }
     },
 

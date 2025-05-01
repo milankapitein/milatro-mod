@@ -2406,3 +2406,193 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Strike
+SMODS.Joker{
+	key = 'strike',
+
+	loc_txt = {
+		name = 'Strike',
+		text = {
+			"This Joker gains {C:mult}+#1#{} Mult",
+			"if hand contains only scoring {C:attention}face cards{}",
+			"Resets if a {C:attention}non-face card{} is scored",
+			"{C:inactive}(Currently {C:mult}+#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = {mult_gain = 3, mult = 0}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.mult_gain, card.ability.extra.mult}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.before then
+			local nonface = false
+			for i = 1, #context.scoring_hand do
+				if not context.scoring_hand[i]:is_face() then nonface = true end
+				if nonface then
+					card.ability.extra.mult = 0
+					return {
+						message = localize('k_reset')
+					}
+				else
+					card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
+					return {
+						message = localize('k_upgrade_ex')
+					}
+				end
+			end
+		end
+		if context.joker_main then
+			return {
+				mult = card.ability.extra.mult
+			}
+		end
+	end
+
+}
+
+-- Ritual
+SMODS.Joker{
+	key = 'ritual',
+
+	loc_txt = {
+		name = 'Ritual',
+		text = {
+			"When {C:attention}boss blind{} is defeated,",
+			"create a random {C:spectral}Spectral{} card"
+		}
+	},
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.end_of_round and G.GAME.blind.boss and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not context.individual and not context.repetition then
+			G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+			G.E_MANAGER:add_event(Event({
+				func = function()
+					card = create_card('Spectral', G.consumables, nil, nil, nil, nil)
+					card:add_to_deck()
+					G.consumeables:emplace(card)
+					G.GAME.consumeable_buffer = 0
+					return true
+				end
+			}))
+			return {
+				message = localize('k_plus_spectral'), 
+				colour = G.C.SECONDARY_SET.Spectral
+			}
+		end 
+	end
+}
+
+-- Mult Money
+SMODS.Joker{
+	key = 'mult_money',
+
+	loc_txt = {
+		name = 'Mult Money',
+		text = {
+			"If hand contains {C:attention}#1# Mult{}",
+			"cards, gain {C:money}$#2#"
+		}
+	},
+
+	config = { extra = {mult_cards = 2, dollars= 5}},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_mult
+		return { vars = {card.ability.extra.mult_cards, card.ability.extra.dollars}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local mult_count = 0
+			for i = 1, #context.full_hand do
+				if context.full_hand[i].config.center.key == "m_mult" then mult_count = mult_count + 1 end
+			end
+			if mult_count >= card.ability.extra.mult_cards then
+				G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+				G.E_MANAGER:add_event(Event({
+					func = (function()
+						G.GAME.dollar_buffer = 0; return true
+					end)
+				}))
+				return {
+					dollars = card.ability.extra.dollars,
+					colour = G.C.MONEY
+				}
+			end
+		end
+	end,
+}
+
+-- Bonus Bonus
+SMODS.Joker{
+	key = 'bonus_bonus',
+
+	loc_txt = {
+		name = 'Bonus Bonus',
+		text = {
+			"{C:attention}Bonus{} cards have a",
+			"{C:green}#1# in #2#{} chance of giving",
+			"{C:white,X:chips}X#3#{} chips"
+		}
+	},
+
+	config = {extra = {min = 1, max = 5, xchips = 2}},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_bonus
+		return {vars = {(G.GAME and G.GAME.probabilities.normal or 1), card.ability.extra.max, card.ability.extra.xchips}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.individual and context.cardarea == G.play then
+			for i = 1, #context.scoring_hand do
+				if context.scoring_hand[i].config.center.key == "m_bonus" and pseudorandom('bonusbonus') < G.GAME.probabilities.normal/card.ability.extra.max then
+					return {
+						xchips = card.ability.extra.xchips,
+						card = card
+					}
+				end
+			end
+		end
+	end
+}
