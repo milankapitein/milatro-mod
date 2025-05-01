@@ -88,15 +88,15 @@ SMODS.Back {
     end
 }
 
--- Space Deck
+-- Singularity Deck
 SMODS.Back {
-    name = "Space Deck",
-    key = "space",
+    name = "Singularity Deck",
+    key = "singularity",
     atlas = "MilatroModDecks",
     pos = {x = 2, y = 0},
 
     loc_txt = {
-        name = "Space Deck",
+        name = "Singularity Deck",
         text = {
             "Start with {C:spectral,T:c_black_hole}Black Hole{},", 
             "{C:planet,T:v_planet_merchant}Planet Merchant{} and",

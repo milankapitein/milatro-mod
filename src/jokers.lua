@@ -1390,29 +1390,6 @@ SMODS.Joker{
 
 -- Butterfly Effect
 --TODO: find a list of all enhancements, in case of a mod adding enhanced
-local enhancements_list = {
-	"Lucky Card",
-	"Glass Card",
-	"Mult Card",
-	"Bonus Card",
-	"Stone Card",
-	"Steel Card",
-	"Gold Card",
-}
-
-local igo = Game.init_game_object
-function Game:init_game_object()
-	local ret = igo(self)
-	ret.current_round.butterfly_card = { enhancement = enhancements_list[1]}
-	return ret
-end
-
-function SMODS.current_mod.reset_game_globals(run_start)
-	G.GAME.current_round.butterfly_card = { enhancement = enhancements_list[1] }
-	local butterfly_card = pseudorandom("butterfly", 1, #enhancements_list)
-	G.GAME.current_round.butterfly_card.enhancement = enhancements_list[butterfly_card]
-end
-
 SMODS.Joker{
 	key = 'butterfly_effect',
 
@@ -2314,9 +2291,13 @@ SMODS.Joker{
 				local random = pseudorandom(pseudoseed("lootbox"), 1, len)
 				for k in pairs(G.P_TAGS) do
 					if count == random then
+						local tag = Tag(k)
+						if tag.name == "Orbital Tag" then
+							tag.ability.orbital_hand = G.handlist[pseudorandom('orbital_hand', 1, #G.handlist)] 
+						end
 						G.E_MANAGER:add_event(Event({
 						func = (function()
-							add_tag(Tag(k))
+							add_tag(tag)
 							play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
 							play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
 							return true
@@ -2325,6 +2306,102 @@ SMODS.Joker{
 					end
 					count = count + 1
 				end	
+			end
+		end
+	end
+}
+
+-- Elemental Destroyer
+SMODS.Joker{
+	key = 'elemental_destroyer',
+
+	loc_txt = {
+		name = 'Elemental Destroyer',
+		text = {
+			"Changes {C:attention}#1#{} card in {C:attention}first hand{}",
+			"of round to a {C:attention}Wild Card{}"
+		}
+	},
+
+	config = { extra = 1},
+	
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
+		return { vars = {card.ability.extra}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.before and G.GAME.current_round.hands_played == 0 then
+			for i = 1, card.ability.extra do
+				local random_card = pseudorandom("elemental_destroyer", 1, #context.full_hand)
+				context.full_hand[random_card]:set_ability(G.P_CENTERS.m_wild, nil, true)
+				return {
+					message = "Destroyed",
+					card = card
+				}
+			end
+		end
+	end
+}
+
+-- All Seeing Eye
+SMODS.Joker{
+	key = 'all_seeing_eye',
+
+	loc_txt = {
+		name = 'All Seeing Eye',
+		text = {
+			"If hand contains exactly {C:attention}#1#{}",
+			"{C:attention}#2#s{}, create a {C:spectral}Soul{}",
+			"Rank changes each round"
+		}
+	},
+
+	config = { extra = { req_cards = 5}},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.c_soul
+		return { vars = {card.ability.extra.req_cards, G.GAME.current_round.eye_rank.name}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 10,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local count = 0
+			for i = 1, card.ability.extra.req_cards do 
+				if G.GAME.current_round.eye_rank.id == context.full_hand[i]:get_id() then count = count + 1 end
+			end	
+			if count == card.ability.extra.req_cards and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
+				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_soul')
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+						G.GAME.consumeable_buffer = 0
+						return true
+					end
+				}))
+				return {
+					message = localize('k_plus_spectral'), colour = G.C.SECONDARY_SET.Spectral
+				}
 			end
 		end
 	end
