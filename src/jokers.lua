@@ -1092,8 +1092,7 @@ SMODS.Joker{
 		card.ability.extra.min = (G.GAME and G.GAME.probabilities.normal or 1)
 		return { vars = {card.ability.extra.min, card.ability.extra.odds}}
 	end,
-
-
+	
 	rarity = 1,
 	atlas = 'MilatroMod',
 	pos = { x = 1, y = 2 },

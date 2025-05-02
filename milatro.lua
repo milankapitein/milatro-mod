@@ -2,6 +2,8 @@ SMODS.load_file("src/jokers.lua")()
 SMODS.load_file("src/decks.lua")()
 SMODS.load_file("src/vouchers.lua")()
 SMODS.load_file("src/blinds.lua")()
+SMODS.load_file("src/consumables.lua")()
+SMODS.load_file("src/misc.lua")()
 
 
 SMODS.Atlas {
