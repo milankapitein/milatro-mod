@@ -106,7 +106,7 @@ SMODS.Blind{
         name = "The Lower",
         text = {
             "Played hand is considerd",
-			"the hand below"
+			"the poker hand below"
         }
     },
 

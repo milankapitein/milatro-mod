@@ -20,7 +20,7 @@ SMODS.Enhancement{
     key = "ice",
 
     loc_txt = {
-        name = 'Ice',
+        name = 'Ice Card',
         text = {
             "{C:white,X:chips}X#1#{} chips",
             "Enhancement gets removed",

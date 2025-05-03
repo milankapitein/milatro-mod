@@ -2704,12 +2704,114 @@ SMODS.Joker{
 					G.hand.cards[i]:set_edition(poll_edition('shiny_hunting', nil, true, true), true)
 				return true end }))
 			end
-			-- for k, v in pairs(G.hand) do
-			-- 	sendTraceMessage(tostring(v), "shiny_hunting")
-			-- 	G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-			-- 		v:set_edition(poll_edition('shiny_hunting', nil, true, true), true)
-			-- 	return true end }))
-			-- end
+		end
+	end
+}
+
+-- Encore
+SMODS.Joker{
+	key = 'encore',
+
+	loc_txt = {
+		name = 'Encore',
+		text = {
+			"If played hand is the same as",
+			"previous played hand, earn {C:gold}$#1#{}"
+		}
+	},
+
+	config = { extra = { dollars = 3, prev_hand = ''}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.dollars }}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.before then
+			if card.ability.extra.prev_hand == context.scoring_name then
+				G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
+				G.E_MANAGER:add_event(Event({
+					func = (function()
+						G.GAME.dollar_buffer = 0; return true
+					end)
+				}))
+				return {
+					dollars = card.ability.extra.dollars,
+					colour = G.C.MONEY
+				}
+			end
+		end
+		if context.after then
+			card.ability.extra.prev_hand = context.scoring_name
+		end
+	end
+}
+
+-- World Record Pace
+SMODS.Joker{
+	key = 'world_record_pace',
+
+	loc_txt = {
+		name = 'World Record Pace',
+		text = {
+			"When skipping a {C:attention}Blind{}, gain extra",
+			"{C:attention}Tags{} equal to the amount of {C:attention}Blinds{} skipped",
+			"{C:inactive}(Currently {C:attention}#1#{C:inactive} skipped)"
+		}
+	},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {G.GAME.skips }}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.skip_blind then
+			sendTraceMessage(tostring(G.GAME.skips), "milatro_wrp")
+			for i = 1, G.GAME.skips do
+				local count = 1
+				local random = pseudorandom(pseudoseed("worldrecordpace"), 1, get_table_size(G.P_TAGS))
+				for k in pairs(G.P_TAGS) do
+					if count == random then
+						local tag = Tag(k)
+						if tag.name == "Orbital Tag" then
+							tag.ability.orbital_hand = G.handlist[pseudorandom('orbital_hand', 1, #G.handlist)] 
+						end
+						G.E_MANAGER:add_event(Event({
+						func = (function()
+							add_tag(tag)
+							play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+							play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+							return true
+						end)
+						}))	
+					end
+					count = count + 1
+				end
+			end
+			local thunk1 = pseudorandom('wrp_time', -15, 20)
+			local thunk2 = pseudorandom('wrp_time', 0, 99)
+			return {
+				message = tostring(thunk1)..tostring(thunk2),
+				card = card
+			}
 		end
 	end
 }
