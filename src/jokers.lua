@@ -2651,7 +2651,7 @@ SMODS.Joker{
 		text = {
 			"{C:attention}Ice {}cards never thaw",
 			"When triggers hit {C:attention}#1#{},",
-			"The card gains {C:white,X:chips}X#2#{}"
+			"The card gains {C:white,X:chips}X#2#{} chips"
 		}
 	},
 
