@@ -1,3 +1,4 @@
+-- Ice Enhancement
 SMODS.Enhancement{
     key = "ice",
 
@@ -8,7 +9,7 @@ SMODS.Enhancement{
             "Enhancement gets removed after {C:attention}#2#{} triggers"}
     },
 
-    config = { extra = {xchips = 1.5, triggers = 2}},
+    config = { extra = {xchips = 1.5, triggers = 5}},
     loc_vars = function(self, info_queue, card)
         return { vars = {card.ability.extra.xchips, card.ability.extra.triggers}}
     end,
@@ -19,23 +20,15 @@ SMODS.Enhancement{
     calculate = function(self, card, context)
         if context.main_scoring and context.cardarea == G.play then
             card.ability.extra.triggers = card.ability.extra.triggers - 1
-            if card.ability.extra.triggers == 0 then
-                return {
-                    xchips = card.ability.extra.xchips,
-                    G.E_MANAGER:add_event(Event({
-                        func = function()
-                            --todo: remove sprite immediatly
-                            card:juice_up()
-                            card:set_ability(G.P_CENTERS.c_base, nil, true)
-                            return true
-                        end
-                    })),
-                    message = "Thawed!",
-                    card = card
-                }
-            end
             return {
                 xchips = card.ability.extra.xchips,
+            }
+        end
+        if context.after and card.ability.extra.triggers == 0 then
+            card:set_ability(G.P_CENTERS.c_base, nil, true)
+            return { 
+                message = "Thawed!",
+                card = card
             }
         end
     end
