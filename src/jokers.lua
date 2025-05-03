@@ -2595,3 +2595,81 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Frozen Joker
+SMODS.Joker{
+	key = 'frozen_joker',
+
+	loc_txt = {
+		name = 'Frozen Joker',
+		text = {
+			"All {C:attention}Enhanced {}cards are",
+			"turned into {C:attention}Ice {}cards"
+		}
+	},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_mlnc_ice
+		return { vars = {}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	calculate = function(self, card, context)
+		if context.before then
+			local count = 0
+			for i = 1, #context.scoring_hand do
+				--this currently resets buffed ice cards from ice age. maybe get rid of "resetting" ice cards or just on buffed ice cards
+				if context.scoring_hand[i].config.center.key ~= "c_base" then
+					count = count + 1
+					context.scoring_hand[i]:set_ability(G.P_CENTERS.m_mlnc_ice, nil, true)
+				end
+			end
+			if count > 0 then
+				return {
+					message = "Frozen!",
+					card = card
+				}
+			end
+		end
+	end
+}
+
+-- Ice Age
+SMODS.Joker{
+	key = 'ice_age',
+
+	loc_txt = {
+		name = 'Ice Age',
+		text = {
+			"{C:attention}Ice {}cards never thaw",
+			"When triggers hit {C:attention}#1#{},",
+			"The card gains {C:white,X:chips}X#2#{}"
+		}
+	},
+
+	config = { extra = {triggers = 0, xchip_gain = 0.25 }},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_CENTERS.m_mlnc_ice
+		return { vars = { card.ability.extra.triggers, card.ability.extra.xchip_gain}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 8,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = false,
+
+	--check misc.lua for joker logic
+}

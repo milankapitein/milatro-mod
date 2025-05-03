@@ -9,7 +9,7 @@ SMODS.Enhancement{
             "Enhancement gets removed after {C:attention}#2#{} triggers"}
     },
 
-    config = { extra = {xchips = 1.5, triggers = 5}},
+    config = { extra = {xchips = 1.5, triggers = 5, max_triggers = 5}},
     loc_vars = function(self, info_queue, card)
         return { vars = {card.ability.extra.xchips, card.ability.extra.triggers}}
     end,
@@ -25,11 +25,21 @@ SMODS.Enhancement{
             }
         end
         if context.after and card.ability.extra.triggers == 0 then
-            card:set_ability(G.P_CENTERS.c_base, nil, true)
-            return { 
-                message = "Thawed!",
-                card = card
-            }
+            if next(SMODS.find_card("j_mlnc_ice_age")) then
+                card.ability.extra.xchips = card.ability.extra.xchips + SMODS.find_card("j_mlnc_ice_age")[1].ability.extra.xchip_gain
+                card.ability.extra.triggers = card.ability.extra.max_triggers
+                return {
+                    message = "Re-frozen!",
+                    card = card
+                }
+            else
+                card:set_ability(G.P_CENTERS.c_base, nil, true)
+                return { 
+                    message = "Thawed!",
+                    card = card
+                }
+            end
+
         end
     end
 }
