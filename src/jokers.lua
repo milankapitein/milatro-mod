@@ -1865,7 +1865,7 @@ SMODS.Joker{
 
 	rarity = 1,
 	atlas = 'MilatroMod',
-	pos = { x = 0, y = 0 },
+	pos = { x = 2, y = 3 },
 	cost = 5,
 
 	unlocked = true,
@@ -2672,4 +2672,44 @@ SMODS.Joker{
 	blueprint_compat = false,
 
 	--check misc.lua for joker logic
+}
+
+-- Shiny Hunting
+SMODS.Joker{
+	key = 'shiny_hunting',
+
+	loc_txt = {
+		name = 'Shiny Hunting',
+		text = {
+			"Sell this Joker to add {C:edition}Foil{},",
+			"{C:edition}Holographic{} or {C:edition}Polychrome{}",
+			"to all cards in hand"
+		}
+	},
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 1, y = 3 },
+	cost = 9,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.selling_self then
+			-- if G.hand.cards == nil then return end
+			for i = 1, #G.hand.cards do
+				G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+					G.hand.cards[i]:set_edition(poll_edition('shiny_hunting', nil, true, true), true)
+				return true end }))
+			end
+			-- for k, v in pairs(G.hand) do
+			-- 	sendTraceMessage(tostring(v), "shiny_hunting")
+			-- 	G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+			-- 		v:set_edition(poll_edition('shiny_hunting', nil, true, true), true)
+			-- 	return true end }))
+			-- end
+		end
+	end
 }
