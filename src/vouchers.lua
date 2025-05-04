@@ -1,3 +1,4 @@
+-- Turbo Boost
 SMODS.Voucher{
     key = "turbo_v",
     atlas = "MilatroMod",
@@ -24,6 +25,72 @@ SMODS.Voucher{
     end
 }
 
+-- Nitro Boost
+G.FUNCS.reroll_shop = function(e) 
+  stop_use()
+  G.CONTROLLER.locks.shop_reroll = true
+  if G.CONTROLLER:save_cardarea_focus('shop_jokers') then G.CONTROLLER.interrupt.focus = true end
+  if G.GAME.current_round.reroll_cost > 0 then 
+    inc_career_stat('c_shop_dollars_spent', G.GAME.current_round.reroll_cost)
+    inc_career_stat('c_shop_rerolls', 1)
+    ease_dollars(-G.GAME.current_round.reroll_cost)
+  end
+  G.E_MANAGER:add_event(Event({
+      trigger = 'immediate',
+      func = function()
+        local final_free = G.GAME.current_round.free_rerolls > 0
+        G.GAME.current_round.free_rerolls = math.max(G.GAME.current_round.free_rerolls - 1, 0)
+        G.GAME.round_scores.times_rerolled.amt = G.GAME.round_scores.times_rerolled.amt + 1
+
+        calculate_reroll_cost(final_free)
+        for i = #G.shop_jokers.cards,1, -1 do
+          local c = G.shop_jokers:remove_card(G.shop_jokers.cards[i])
+          c:remove()
+          c = nil
+        end
+
+        play_sound('coin2')
+        play_sound('other1')
+
+        if G.GAME.used_vouchers.v_mlnc_nitro_v and #G.shop_booster.cards < 1 then
+          G.GAME.current_round.used_packs[1] = get_pack('shop_pack').key
+          local card = Card(G.shop_booster.T.x + G.shop_booster.T.w/2,
+          G.shop_booster.T.y, G.CARD_W*1.27, G.CARD_H*1.27, G.P_CARDS.empty, G.P_CENTERS[G.GAME.current_round.used_packs[1]], {bypass_discovery_center = true, bypass_discovery_ui = true})
+          create_shop_card_ui(card, 'Booster', G.shop_booster)
+          card.ability.booster_pos = 1
+          card:start_materialize()
+          G.shop_booster:emplace(card)
+        end
+        
+        for i = 1, G.GAME.shop.joker_max - #G.shop_jokers.cards do
+          local new_shop_card = create_card_for_shop(G.shop_jokers)
+          G.shop_jokers:emplace(new_shop_card)
+          new_shop_card:juice_up()
+        end
+        return true
+      end
+    }))
+    G.E_MANAGER:add_event(Event({
+      trigger = 'after',
+      delay = 0.3,
+      func = function()
+      G.E_MANAGER:add_event(Event({
+        func = function()
+          G.CONTROLLER.interrupt.focus = false
+          G.CONTROLLER.locks.shop_reroll = false
+          G.CONTROLLER:recall_cardarea_focus('shop_jokers')
+          for i = 1, #G.jokers.cards do
+            G.jokers.cards[i]:calculate_joker({reroll_shop = true})
+          end
+          return true
+        end
+      }))
+      return true
+    end
+  }))
+  G.E_MANAGER:add_event(Event({ func = function() save_run(); return true end}))
+end
+
 SMODS.Voucher{
     key = "nitro_v",
     atlas = "MilatroMod",
@@ -47,72 +114,6 @@ SMODS.Voucher{
 
     requires = {'v_mlnc_turbo_v' }
 }
-
---reroll hook
-G.FUNCS.reroll_shop = function(e) 
-    stop_use()
-    G.CONTROLLER.locks.shop_reroll = true
-    if G.CONTROLLER:save_cardarea_focus('shop_jokers') then G.CONTROLLER.interrupt.focus = true end
-    if G.GAME.current_round.reroll_cost > 0 then 
-      inc_career_stat('c_shop_dollars_spent', G.GAME.current_round.reroll_cost)
-      inc_career_stat('c_shop_rerolls', 1)
-      ease_dollars(-G.GAME.current_round.reroll_cost)
-    end
-    G.E_MANAGER:add_event(Event({
-        trigger = 'immediate',
-        func = function()
-          local final_free = G.GAME.current_round.free_rerolls > 0
-          G.GAME.current_round.free_rerolls = math.max(G.GAME.current_round.free_rerolls - 1, 0)
-          G.GAME.round_scores.times_rerolled.amt = G.GAME.round_scores.times_rerolled.amt + 1
-
-          calculate_reroll_cost(final_free)
-          for i = #G.shop_jokers.cards,1, -1 do
-            local c = G.shop_jokers:remove_card(G.shop_jokers.cards[i])
-            c:remove()
-            c = nil
-          end
-
-          play_sound('coin2')
-          play_sound('other1')
-
-          if G.GAME.used_vouchers.v_mlnc_nitro_v and #G.shop_booster.cards < 1 then
-            G.GAME.current_round.used_packs[1] = get_pack('shop_pack').key
-            local card = Card(G.shop_booster.T.x + G.shop_booster.T.w/2,
-            G.shop_booster.T.y, G.CARD_W*1.27, G.CARD_H*1.27, G.P_CARDS.empty, G.P_CENTERS[G.GAME.current_round.used_packs[1]], {bypass_discovery_center = true, bypass_discovery_ui = true})
-            create_shop_card_ui(card, 'Booster', G.shop_booster)
-            card.ability.booster_pos = 1
-            card:start_materialize()
-            G.shop_booster:emplace(card)
-          end
-          
-          for i = 1, G.GAME.shop.joker_max - #G.shop_jokers.cards do
-            local new_shop_card = create_card_for_shop(G.shop_jokers)
-            G.shop_jokers:emplace(new_shop_card)
-            new_shop_card:juice_up()
-          end
-          return true
-        end
-      }))
-      G.E_MANAGER:add_event(Event({
-        trigger = 'after',
-        delay = 0.3,
-        func = function()
-        G.E_MANAGER:add_event(Event({
-          func = function()
-            G.CONTROLLER.interrupt.focus = false
-            G.CONTROLLER.locks.shop_reroll = false
-            G.CONTROLLER:recall_cardarea_focus('shop_jokers')
-            for i = 1, #G.jokers.cards do
-              G.jokers.cards[i]:calculate_joker({reroll_shop = true})
-            end
-            return true
-          end
-        }))
-        return true
-      end
-    }))
-    G.E_MANAGER:add_event(Event({ func = function() save_run(); return true end}))
-end
 
 -- Reconstruction
 SMODS.Voucher{

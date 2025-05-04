@@ -183,7 +183,7 @@ SMODS.Back {
     name = "Savings Deck",
     key = "savings",
     atlas = "MilatroModDecks",
-    pos = {x = 0, y = 0},
+    pos = {x = 4, y = 0},
 
     loc_txt = {
         name = "Savings Deck",

@@ -1,6 +1,5 @@
 Use_tarot = function(flip_back, used_tarot)
     if not flip_back then
-        --todo: add the move animation to the start of the tarot
         G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.4,func = function() play_sound('tarot1'); used_tarot:juice_up(0.3, 0.5); return true end }))
         for i=1, #G.hand.highlighted do
             local percent = 1.15 - (i-0.999)/(#G.hand.highlighted-0.998)*0.3
@@ -18,6 +17,7 @@ Use_tarot = function(flip_back, used_tarot)
 
 end
 
+-- The Sword
 SMODS.Consumable{
     key = 'the_sword',
 

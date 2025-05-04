@@ -311,7 +311,6 @@ SMODS.Joker {
 	end
 }
 
-
 -- Colorblindness
 local original_card_is_suit = Card.is_suit
 function Card:is_suit(suit, bypass_debuff, flush_calc)
@@ -564,13 +563,16 @@ SMODS.Joker {
 	loc_txt = {
 		name = 'Slot Machine',
 		text = {
-			"If hand contains 3 {C:attention}7s{},",
-			"create {C:attention}3 {C:dark_edition}Negative {}Consumables"
+			"If hand contains #1# {C:attention}7s{},",
+			"create {C:attention}#2# {C:dark_edition}Negative {}Consumables"
 		}
 	},
 
+	config = { extra = {seven_count = 3, consumables = 3}},
+
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue + 1] = G.P_CENTERS.e_negative
+		return { vars = {card.ability.extra.seven_count, card.ability.extra.consumables}}
 	end,
 
 	rarity = 3,
@@ -590,10 +592,10 @@ SMODS.Joker {
 					seven_count = seven_count + 1
 				end
 			end
-			if seven_count >= 3 then
+			if seven_count >= card.ability.extra.seven_count then
 				G.E_MANAGER:add_event(Event({
 					func = function()
-						for i = 1, 3 do
+						for i = 1, card.ability.extra.consumables do
 							local card
 							local typeConsumable = pseudorandom(pseudoseed('slot_machine'), 1, 3)
 							if (typeConsumable == 1) then
@@ -1249,7 +1251,7 @@ SMODS.Joker{
 }
 
 -- Betrayal
-SMODS.Joker{
+SMODS.Joker{	
 	key = 'betrayal',
 
 	loc_txt = {
@@ -1377,7 +1379,7 @@ SMODS.Joker{
 		if context.before and not context.blueprint then
 			card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
 		end
-		if context.end_of_round and G.GAME.blind.boss and not context.blueprint and not context.repetition and not context.individual then
+		if context.end_of_round and G.GAME.blind.boss and not context.blueprint and context.main_eval then
 			card.ability.extra.mult = card.ability.extra.mult - card.ability.extra.mult_loss
 			if card.ability.extra.mult < 0 then card.ability.extra.mult = 0 end
 			return {
@@ -1650,13 +1652,15 @@ SMODS.Joker{
 		name = 'Impending Doom',
 		text = {
 			"{C:white,X:mult}X#1#{} Mult,",
-			"All non-finisher boss blinds are the Cover"
+			"All non-finisher boss blinds ",
+			"are {C:attention}the Cover"
 		}
 	},
 
 	config = {extra = {Xmult = 3}},
 
 	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_BLINDS.bl_mlnc_the_cover
 		return { vars = { card.ability.extra.Xmult } }
 	end,
 
@@ -2575,7 +2579,7 @@ SMODS.Joker{
 
 	rarity = 2,
 	atlas = 'MilatroMod',
-	pos = { x = 0, y = 0 },
+	pos = { x = 3, y = 3 },
 	cost = 7,
 
 	unlocked = true,
@@ -2858,6 +2862,47 @@ SMODS.Joker{
 					Xmult = card.ability.extra.xmult
 				}
 			end
+		end
+	end
+}
+
+-- Manifesto
+SMODS.Joker{
+	key = 'manifesto',
+
+	loc_txt = {
+		name = 'Manifesto',
+		text = {
+			"{C:mult}+#1#{} Mult",
+			"This Joker is always {C:attention}Pinned"
+		}
+	},
+
+	config = { extra = 20},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = {key = 'pinned_left', set = 'Other'}
+		return { vars = {card.ability.extra}}
+	end,
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	add_to_deck = function(self, card, from_debuff)
+		card.pinned = true
+	end,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				mult = card.ability.extra
+			}
 		end
 	end
 }

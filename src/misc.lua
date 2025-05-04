@@ -1,3 +1,4 @@
+-- Ice Enhancement
 Thaw = function(card)
     if next(SMODS.find_card("j_mlnc_ice_age")) then
         card.ability.extra.xchips = card.ability.extra.xchips + SMODS.find_card("j_mlnc_ice_age")[1].ability.extra.xchip_gain
@@ -15,7 +16,6 @@ Thaw = function(card)
     end
 end
 
--- Ice Enhancement
 SMODS.Enhancement{
     key = "ice",
 
@@ -32,8 +32,8 @@ SMODS.Enhancement{
         return { vars = {card.ability.extra.xchips, card.ability.extra.triggers}}
     end,
 
-    atlas = 'MilatroMod',
-	pos = { x = 0, y = 0 },
+    atlas = 'MilatroModDecks',
+	pos = { x = 0, y = 1 },
 
     calculate = function(self, card, context)
         if context.main_scoring and context.cardarea == G.play then

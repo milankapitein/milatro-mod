@@ -79,7 +79,7 @@ local enhancements_list = {
 	"Bonus Card",
 	"Stone Card",
 	"Steel Card",
-	"Gold Card",
+	"Gold Card"
 }
 
 local igo = Game.init_game_object
