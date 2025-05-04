@@ -1636,7 +1636,7 @@ local hook_new_boss = get_new_boss
 function get_new_boss()
 	if (next(SMODS.find_card('j_mlnc_impending_doom'))) and (G.GAME.round_resets.ante % 8) ~= 0 then 
 		for k,v in pairs(G.P_BLINDS) do
-			if G.P_BLINDS[k].name == "bl_mlnc_the_illusion" then
+			if G.P_BLINDS[k].name == "bl_mlnc_the_cover" then
 				return k
 			end
 		end
@@ -1650,7 +1650,7 @@ SMODS.Joker{
 		name = 'Impending Doom',
 		text = {
 			"{C:white,X:mult}X#1#{} Mult,",
-			"All non-finisher boss blinds are the Illusion"
+			"All non-finisher boss blinds are the Cover"
 		}
 	},
 
@@ -2808,10 +2808,56 @@ SMODS.Joker{
 			end
 			local thunk1 = pseudorandom('wrp_time', -15, 20)
 			local thunk2 = pseudorandom('wrp_time', 0, 99)
+			local plus = ''
+			if thunk1 > 0 then plus = '+' end
 			return {
-				message = tostring(thunk1)..tostring(thunk2),
+				message = plus..tostring(thunk1).."."..tostring(thunk2),
 				card = card
 			}
+		end
+	end
+}
+
+-- Binary
+SMODS.Joker{
+	key = 'binary',
+
+	loc_txt = {
+		name = 'Binary',
+		text = {
+			"{C:white,X:mult}X#1#{} Mult if played hand",
+			"contains exactly {C:attention}#2#{} unique {C:attention}suits"
+		}
+	},
+
+	config = { extra = {xmult = 3, suits = 2}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.xmult, card.ability.extra.suits}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local suits = get_suits_count(context)
+			local count = 0
+			if suits["Clubs"] > 0 then count = count + 1 end
+			if suits["Hearts"] > 0 then count = count + 1 end
+			if suits["Diamonds"] > 0 then count = count + 1 end
+			if suits["Spades"] > 0 then count = count + 1 end
+			if count == card.ability.extra.suits then
+				return {
+					Xmult = card.ability.extra.xmult
+				}
+			end
 		end
 	end
 }

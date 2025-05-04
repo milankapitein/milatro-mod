@@ -1,8 +1,8 @@
--- The Count
+-- The Pack
 SMODS.Blind{
-    key = 'the_count',
+    key = 'the_pack',
     loc_txt = {
-        name = "The Count",
+        name = "The Pack",
         text = {
             "The most frequent card",
             "in your deck is debuffed"
@@ -18,7 +18,7 @@ SMODS.Blind{
     mult = 2,
 
     boss = {min = 1, max = 10},
-    boss_colour = HEX("389396"),
+    boss_colour = HEX("b81c38"),
 
 
     recalc_debuff = function(self, card, from_blind)
@@ -56,11 +56,11 @@ SMODS.Blind{
     end
 }
 
--- The Illusion
+-- The Cover
 SMODS.Blind{
-    key = 'the_illusion',
+    key = 'the_cover',
     loc_txt = {
-        name = "The Illusion",
+        name = "The Cover",
         text = {
             "Picks a random,",
 			"non-finisher Boss Blind"
@@ -76,7 +76,7 @@ SMODS.Blind{
     mult = 2,
 
     boss = {min = 3, max = 10},
-    boss_colour = HEX("751e0b"),
+    boss_colour = HEX("291a59"),
 
 	set_blind = function(self)
 		local length = 0
@@ -99,11 +99,11 @@ SMODS.Blind{
 	end
 }
 
--- The Lower
+-- The Pit
 SMODS.Blind{
-	key = 'the_lower',
+	key = 'the_pit',
     loc_txt = {
-        name = "The Lower",
+        name = "The Pit",
         text = {
             "Played hand is considerd",
 			"the poker hand below"
@@ -119,7 +119,7 @@ SMODS.Blind{
     mult = 2,
 
     boss = {min = 2, max = 10},
-    boss_colour = HEX("27cfdb"),
+    boss_colour = HEX("1d5054"),
 
 	modify_hand = function(self, cards, poker_hands, text, mult, hand_chips)
 		if text == "High Card" then return mult, hand_chips, false end
@@ -133,11 +133,11 @@ SMODS.Blind{
 	end
 }
 
--- The Wrecker
+-- The Fire
 SMODS.Blind{
-	key = 'the_wrecker',
+	key = 'the_fire',
     loc_txt = {
-        name = "The Wrecker",
+        name = "The Fire",
         text = {
             "After each hand, destroy a random",
 			"Joker, card or consumable",
@@ -153,7 +153,7 @@ SMODS.Blind{
     mult = 2,
 
     boss = {min = 4, max = 10},
-    boss_colour = HEX("16960f"),
+    boss_colour = HEX("cc5729"),
 
 	drawn_to_hand = function()
 		if G.GAME.current_round.hands_played ~= 0 then
@@ -213,7 +213,7 @@ SMODS.Blind{
     mult = 2,
 
     boss = {min = 2, max = 10},
-    boss_colour = HEX("7b29ab"),
+    boss_colour = HEX("bf43af"),
 
 	set_blind = function(self)
 		if G.jokers.cards[1] then
@@ -224,17 +224,4 @@ SMODS.Blind{
 	recalc_debuff = function(self, card, from_blind)
 		return card == G.jokers.cards[1]
 	end
-
-
-	-- disable = function(self)
-	-- 	if G.jokers.cards[1] then
-	-- 		G.jokers.cards[1]:set_debuff(false)
-	-- 	end
-	-- end,
-
-	-- defeat = function(self)
-	-- 	if G.jokers.cards[1] then
-	-- 		G.jokers.cards[1]:set_debuff(false)
-	-- 	end
-	-- end
 }
