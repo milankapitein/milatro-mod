@@ -31,7 +31,7 @@ SMODS.Consumable{
     object_type = "Consumable",
     set = 'Tarot',
 
-    cost = 4,
+    cost = 3,
     atlas = 'MilatroMod',
 	pos = { x = 0, y = 0 },
     unlocked = true,
@@ -53,5 +53,94 @@ SMODS.Consumable{
         G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function() G.hand.highlighted[1]:set_ability(G.P_CENTERS.m_mlnc_ice);return true end }))
         Use_tarot(true, copier or card)
         return {}
+    end
+}
+
+-- Necromancer
+SMODS.Consumable{
+    key = 'necromancer',
+
+    loc_txt = {
+        name = 'Necromancer',
+        text = {
+            "Create a random {C:spectral}Spectral{} card",
+            "{C:inactive}Must have room{}" }
+    },
+
+    object_type = "Consumable",
+    set = 'Tarot',
+
+    cost = 3,
+    atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+    unlocked = true,
+    discovered = true,
+
+    can_use = function(self, card)
+        return #G.consumeables.cards < G.consumeables.config.card_limit or card.area == G.consumeables
+    end,
+    use = function(self, card, area, copier)
+        play_sound('timpani')
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                local used_tarot = copier or card
+                used_tarot:juice_up(0.3, 0.5)
+                local made_card = create_card('Spectral', G.consumables, nil, nil, nil, nil)
+                made_card:add_to_deck()
+                G.consumeables:emplace(made_card)
+                return true
+            end
+        }))
+    end
+}
+
+-- Summon
+SMODS.Consumable{
+    key = 'summon',
+
+    loc_txt = {
+        name = 'Summon',
+        text = {
+            "Create up to {C:attention}#1# Jokers{},",
+            "lose {C:red}-$#2#",
+            "{C:inactive}(Must have Room)" }
+    },
+
+    object_type = "Consumable",
+    set = 'Spectral',
+
+    cost = 4,
+    atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+    unlocked = true,
+    discovered = true,
+
+    config = { extra = {jokers = 5, money_loss = 10}},
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.jokers, card.ability.extra.money_loss}}
+    end,
+
+    can_use = function(self, card)
+        return #G.jokers.cards + G.GAME.joker_buffer < G.jokers.config.card_limit
+    end,
+
+    use = function(self, card, area, copier)
+        local jokers_to_create = math.min(card.ability.extra.jokers, G.jokers.config.card_limit - (#G.jokers.cards + G.GAME.joker_buffer))
+        G.GAME.joker_buffer = G.GAME.joker_buffer + jokers_to_create
+        play_sound('timpani')
+        G.E_MANAGER:add_event(Event({
+            func = function() 
+                local used_tarot = copier or card
+                used_tarot:juice_up(0.3, 0.5)
+                for i = 1, jokers_to_create do
+                    local other_card = create_card('Joker', G.jokers, nil, nil, nil, nil)
+                    other_card:add_to_deck()
+                    G.jokers:emplace(other_card)
+                    other_card:start_materialize()
+                    G.GAME.joker_buffer = 0
+                end
+                return true
+            end})) 
+        ease_dollars(-1 * card.ability.extra.money_loss, true)
     end
 }
