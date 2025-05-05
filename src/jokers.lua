@@ -727,11 +727,8 @@ SMODS.Joker{
 	config = { extra = { Xmult_gain = 0.5, debt = 5, Xmult = 1, compareNum = 0}},
 
 	loc_vars = function(self, info_queue, card)
-		card.ability.extra.compareNum = 0
-		if SMODS.find_mod('Talisman') == nil then
-			card.ability.extra.compareNum = to_big(0)
-		end
-		if G.GAME.dollars < card.ability.extra.compareNum then
+		-- card.ability.extra.compareNum = to_big(0)
+		if to_number(G.GAME.dollars) < to_number(0) then
 			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.debt, card.ability.extra.Xmult + math.abs(G.GAME.dollars) * card.ability.extra.Xmult_gain }}
 		else
 			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.debt, card.ability.extra.Xmult }}
@@ -759,8 +756,8 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main then
 			local mult = 0
-			if G.GAME.dollars < card.ability.extra.compareNum then
-				mult = card.ability.extra.Xmult + math.abs(G.GAME.dollars) * card.ability.extra.Xmult_gain
+			if to_number(G.GAME.dollars) < to_number(0) then
+				mult = card.ability.extra.Xmult + math.abs(to_number(G.GAME.dollars)) * card.ability.extra.Xmult_gain
 			else
 				mult = card.ability.extra.Xmult
 			end
