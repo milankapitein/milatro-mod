@@ -43,6 +43,11 @@ SMODS.Atlas {
 	py = 34
 }
 
+--This is so the game doesnt crash with Talisman and Loan Shark joker
+to_number = to_number or function(x)
+    return x
+end
+
 get_suits_count = function(context)
 	local suits = {
 		["Hearts"] = 0,
