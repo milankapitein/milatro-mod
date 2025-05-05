@@ -2473,10 +2473,10 @@ SMODS.Joker{
 		}
 	},
 
-	rarity = 2,
+	rarity = 1,
 	atlas = 'MilatroMod',
 	pos = { x = 0, y = 0 },
-	cost = 4,
+	cost = 6,
 
 	unlocked = true,
 	discovered = true,
@@ -2697,7 +2697,6 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.selling_self then
-			-- if G.hand.cards == nil then return end
 			for i = 1, #G.hand.cards do
 				G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
 					G.hand.cards[i]:set_edition(poll_edition('shiny_hunting', nil, true, true), true)
@@ -2783,7 +2782,6 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.skip_blind then
-			sendTraceMessage(tostring(G.GAME.skips), "milatro_wrp")
 			for i = 1, G.GAME.skips do
 				local count = 1
 				local random = pseudorandom(pseudoseed("worldrecordpace"), 1, get_table_size(G.P_TAGS))
@@ -2868,22 +2866,28 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Manifesto',
 		text = {
-			"{C:mult}+#1#{} Mult",
+			"{C:white,X:mult}X#1#{} Mult",
 			"This Joker is always {C:attention}Pinned"
 		}
 	},
 
-	config = { extra = 20},
+	config = { extra = 2},
 
 	loc_vars = function(self, info_queue, card)
-		info_queue[#info_queue+1] = {key = 'pinned_left', set = 'Other'}
+		if card.pinned == true then
+			for i = 1, #info_queue do
+				info_queue[i] = nil
+			end
+		else
+			info_queue[#info_queue+1] = {key = 'pinned_left', set = 'Other'}
+		end
 		return { vars = {card.ability.extra}}
 	end,
 
-	rarity = 1,
+	rarity = 2,
 	atlas = 'MilatroMod',
 	pos = { x = 0, y = 0 },
-	cost = 5,
+	cost = 6,
 
 	unlocked = true,
 	discovered = true,
@@ -2896,7 +2900,7 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main then
 			return {
-				mult = card.ability.extra
+				xmult = card.ability.extra
 			}
 		end
 	end
