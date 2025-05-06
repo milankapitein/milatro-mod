@@ -1588,25 +1588,25 @@ SMODS.Joker{
 	end
 }
 
--- The Legend of Jimbo 
+-- Toast
 SMODS.Joker{
-	key = 'the_legend_of_jimbo',
+	key = 'toast',
 
-	loc_txt = {
-		name = 'The Legend of Jimbo',
-		text = {
-			"This Joker gains {C:white,X:mult}X#1#{} Mult",
-			"for each {E:2,T:j_joker}Jimbo {}in your Joker slots",
-			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
-		}
-	},
-
-	config = {extra = {Xmult_gain = 10, Xmult = 1}},
+	-- its -50 just so that in collection it doesnt display as the holy toast
+	config = {extra = { Xmult = 5, actual_rounds = 0, count = -50}},
 
 	loc_vars = function(self, info_queue, card)
-		info_queue[#info_queue+1] = G.P_CENTERS.j_joker
-		local jimbos = SMODS.find_card('j_joker')
-		return { vars = {card.ability.extra.Xmult_gain, card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain}}
+		if card.ability.extra.count == card.ability.extra.actual_rounds then
+			return {
+				vars = {card.ability.extra.Xmult},
+				key = self.key .. '_alt',
+			}
+		else
+			return {
+				vars = {},
+				key = self.key,
+			}
+		end
 	end,
 
 	rarity = 3,
@@ -1618,12 +1618,26 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = true,
 
+	add_to_deck = function(self, card, from_debuff)
+		if card.ability.extra.actual_rounds == 0 then
+			card.ability.extra.actual_rounds = pseudorandom("toast", 3, 6)
+			card.ability.extra.count = 0
+		end
+	end,
+
 	calculate = function(self, card, context)
-		if context.joker_main then
-			local jimbos = SMODS.find_card('j_joker')
+		if context.joker_main and card.ability.extra.count == card.ability.extra.actual_rounds then
 			return {
-				Xmult = card.ability.extra.Xmult + #jimbos * card.ability.extra.Xmult_gain,
+				Xmult = card.ability.extra.Xmult
 			}
+		end
+		if context.end_of_round and context.main_eval and card.ability.extra.count < card.ability.extra.actual_rounds and not context.blueprint then
+			card.ability.extra.count = card.ability.extra.count + 1
+			if card.ability.extra.count == card.ability.extra.actual_rounds then
+				return {
+					message = "Blessed!"
+				}
+			end
 		end
 	end
 }
@@ -2773,7 +2787,7 @@ SMODS.Joker{
 
 	rarity = 3,
 	atlas = 'MilatroMod',
-	pos = { x = 0, y = 0 },
+	pos = { x = 4, y = 3 },
 	cost = 8,
 
 	unlocked = true,
