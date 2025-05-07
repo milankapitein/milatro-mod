@@ -1568,17 +1568,11 @@ SMODS.Joker{
 								else
 									diff_card:start_dissolve()
 								end return true end }))
-
-						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
-							G.E_MANAGER:add_event(Event({
-								func = (function()
-									G.GAME.dollar_buffer = 0; return true
-								end)
-							}))
+					ease_dollars(card.ability.extra.dollars)
 					card.ability.extra.contains7 = false
 					return {
 						remove = true,
-						card = context.other_card,
+						card = context.scoring_hand[i],
 						message = "Yummy"
 					}
 				end
