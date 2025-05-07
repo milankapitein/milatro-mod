@@ -1581,11 +1581,11 @@ SMODS.Joker{
 		text = {
 			"If hand contains both a",
 			"scoring {C:attention}7 {}and {C:attention}9{},",
-			"destroy {C:attention}1 {}scoring {C:attention}9{} and earn {C:money}$#1#{}"
+			"destroy {C:attention}all {}scoring {C:attention}9{} and earn {C:money}$#1#{}"
 		}
 	},
 
-	config = { extra = {dollars = 6, contains7 = false}},
+	config = { extra = {dollars = 6, contains7 = false, to_destroy = {}, money_granted = false}},
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars}}
@@ -1602,6 +1602,7 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before and not context.blueprint then
+			card.ability.extra.to_destroy = {}
 			for i = 1, #context.scoring_hand do
 				if context.scoring_hand[i]:get_id() == 7 then
 					card.ability.extra.contains7 = true
@@ -1609,35 +1610,25 @@ SMODS.Joker{
 			end
 		end
 
-		if not context.blueprint and context.destroying_card then
-			for i = 1, #context.scoring_hand do 
-				if context.scoring_hand[i]:get_id() == 9 and card.ability.extra.contains7 then
-					G.E_MANAGER:add_event(Event({
-						trigger = 'after',
-						delay = 0.2,
-						func = function() 
-								local diff_card = context.scoring_hand[i]
-								if diff_card.ability.name == 'Glass Card' then 
-									diff_card:shatter()
-								else
-									diff_card:start_dissolve()
-								end return true end }))
-
-						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + card.ability.extra.dollars
-							G.E_MANAGER:add_event(Event({
-								func = (function()
-									G.GAME.dollar_buffer = 0; return true
-								end)
-							}))
-					card.ability.extra.contains7 = false
-					return {
-						remove = true,
-						card = context.other_card,
-						message = "Yummy"
-					}
+		if context.individual and context.cardarea == G.play and not context.blueprint then
+			if context.other_card:get_id() == 9 and card.ability.extra.contains7 then
+				if not contains(card.ability.extra.to_destroy, context.other_card) then
+					card.ability.extra.to_destroy[#card.ability.extra.to_destroy + 1] = context.other_card
 				end
 			end
-			card.ability.extra.contains7 = false
+		end
+
+		if context.destroying_card and not context.blueprint then
+			if not card.ability.extra.money_granted and contains(card.ability.extra.to_destroy, context.destroying_card) then
+				card.ability.extra.money_granted = true
+				ease_dollars(card.ability.extra.dollars)
+			end
+			return contains(card.ability.extra.to_destroy, context.destroying_card)
+		end
+
+		if context.after and not context.blueprint then
+			card.ability.extra.to_destroy = nil
+			card.ability.extra.money_granted = false
 		end
 	end
 }
