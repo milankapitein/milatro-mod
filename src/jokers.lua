@@ -1477,11 +1477,6 @@ SMODS.Joker{
 	blueprint_compat = false,
 
 	calculate = function(self, card, context)
-		if context.end_of_round and not context.blueprint and not context.repetition and not context.individual then
-			return {
-				message = "Reset!"
-			}
-		end
 		if context.check_enhancement then
 			if context.other_card.ability.name == "Wild Card" then
 				if G.GAME.current_round.butterfly_card.enhancement == "Lucky Card" then
