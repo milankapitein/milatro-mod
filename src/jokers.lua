@@ -1039,6 +1039,11 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
+			for k, v in pairs(G.playing_cards) do
+				if v:get_id() == 4 and v.ability.name == "Wild Card" then
+					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+				end
+			end
 			return {
 				Xmult = card.ability.extra.Xmult
 			}
