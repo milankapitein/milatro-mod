@@ -1009,6 +1009,11 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
+			for k, v in pairs(G.playing_cards) do
+				if v:get_id() == 4 and v.ability.name == "Wild Card" then
+					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
+				end
+			end
 			return {
 				Xmult = card.ability.extra.Xmult
 			}
@@ -1386,6 +1391,31 @@ SMODS.Joker{
 
 -- Butterfly Effect
 --TODO: find a list of all enhancements, in case of a mod adding enhanced
+local enhancements_list = {
+	"Lucky Card",
+	"Glass Card",
+	"Mult Card",
+	"Bonus Card",
+	"Stone Card",
+	"Steel Card",
+	"Gold Card",
+}
+
+local igo = Game.init_game_object
+function Game:init_game_object()
+	local ret = igo(self)
+	ret.current_round.butterfly_card = { enhancement = enhancements_list[1]}
+	return ret
+end
+
+function SMODS.current_mod.reset_game_globals(run_start)
+	G.GAME.current_round.butterfly_card = { enhancement = enhancements_list[1] }
+	local butterfly_card = pseudorandom("butterfly", 1, #enhancements_list)
+	G.GAME.current_round.butterfly_card.enhancement = enhancements_list[butterfly_card]
+end
+
+SMODS.current_mod.optional_features = { quantum_enhancements = true }
+
 SMODS.Joker{
 	key = 'butterfly_effect',
 
@@ -1398,8 +1428,6 @@ SMODS.Joker{
 			"the end of each round"
 		}
 	},
-
-	config = { vars = { enhancement = ""} },
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
@@ -1415,102 +1443,36 @@ SMODS.Joker{
 	discovered = true,
 	blueprint_compat = false,
 
-	calculate = function(self, card, context) 
-		if context.end_of_round and not context.blueprint and not context.repetition and not context.individual then
-			return {
-				message = "Reset!"
-			}
-		end
-		--[[
-		TODO:
-		The code snippet below works when using the latest dev build (at the time 1.0.0~BETA-0416b-STEAMODDED)
-		However, this does not work on the latest release of Steamodded (1.0.0~BETA-0323b-STEAMODDED) 
-		The used code is bad and will be replaced once Steamodded is updated
-		This snippet got inspired by https://github.com/GuilloryCraft/ExtraCredit/blob/main/src/essay.lua
-		--]]
-
-		-- if context.check_enhancement then
-        --     if context.other_card.config.center.key == "m_wild" then
-        --         return {m_mult = true}
-        --     end
-        -- end
-
-		if context.individual and context.cardarea == G.play and not context.blueprint then
+	calculate = function(self, card, context)
+		if context.check_enhancement then
 			if context.other_card.ability.name == "Wild Card" then
-				-- TO DO: make this code work better by not hard coding effect
 				if G.GAME.current_round.butterfly_card.enhancement == "Lucky Card" then
-					local mult = 0
-					local money = 0
-					if pseudorandom('lucky_mult') < (G.GAME and G.GAME.probabilities.normal or 1) / 5 then
-						context.other_card.lucky_trigger = true
-						mult = 20
-					end
-					if pseudorandom('lucky_money') < (G.GAME and G.GAME.probabilities.normal or 1) / 15 then
-						context.other_card.lucky_trigger = true
-						money = 20
-						G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + money
-						G.E_MANAGER:add_event(Event({
-							func = (function()
-								G.GAME.dollar_buffer = 0; return true
-							end)
-						}))
-					end
-					if money > 0 then
-						return {
-							mult_mod = mult,
-							dollars = money,
-							colour = G.C.MONEY,
-							card = context.other_card
-						}
-					elseif mult > 0 then
-						return {
-							mult_mod = mult,
-							message = localize { type = 'variable', key = 'a_mult', vars = { mult } },
-							card = context.other_card
-						}
-					else return
-					end
+					return {
+						m_lucky = true
+					}
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Glass Card" then
 					return {
-						Xmult_mod = 2,
-						message = localize { type = 'variable', key = 'a_xmult', vars = { 2 } },
-						card = context.other_card
+						m_glass = true
 					}
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Mult Card" then
 					return {
-						mult_mod = 4,
-						message = localize { type = 'variable', key = 'a_mult', vars = { 4 } },
-						card = context.other_card
+						m_mult = true
 					}
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Bonus Card" then
 					return {
-						chip_mod = 30,
-						message = localize { type = 'variable', key = 'a_chips', vars = { 30 } },
-						card = context.other_card
+						m_bonus = true
 					}
-
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Stone Card" then
 					return {
-						chip_mod = 50,
-						message = localize { type = 'variable', key = 'a_chips', vars = { 50 } },
-						card = context.other_card
+						m_stone = true
 					}
-				end
-			end
-		end
-		if context.individual and context.cardarea == G.hand and not context.blueprint then
-			if context.other_card.ability.name == "Wild Card" then
-				if G.GAME.current_round.butterfly_card.enhancement == "Steel Card" and not context.end_of_round then
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Steel Card" then
 					return {
-						x_mult = 1.5,
-						card = context.other_card
+						m_steel = true
 					}
-				elseif G.GAME.current_round.butterfly_card.enhancement == "Gold Card" and context.end_of_round then
-					G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + 3
-					G.E_MANAGER:add_event(Event({ func = (function() G.GAME.dollar_buffer = 0; return true end) }))
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Gold Card" then
 					return {
-						dollars = 3,
-						card = context.other_card
+						m_gold = true
 					}
 				end
 			end
@@ -1527,11 +1489,11 @@ SMODS.Joker{
 		text = {
 			"If hand contains both a",
 			"scoring {C:attention}7 {}and {C:attention}9{},",
-			"destroy {C:attention}1 {}scoring {C:attention}9{} and earn {C:money}$#1#{}"
+			"destroy {C:attention}all {}scoring {C:attention}9{} and earn {C:money}$#1#{}"
 		}
 	},
 
-	config = { extra = {dollars = 6, contains7 = false}},
+	config = { extra = {dollars = 6, contains7 = false, to_destroy = {}, money_granted = false}},
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = { card.ability.extra.dollars}}
@@ -1548,6 +1510,7 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before and not context.blueprint then
+			card.ability.extra.to_destroy = {}
 			for i = 1, #context.scoring_hand do
 				if context.scoring_hand[i]:get_id() == 7 then
 					card.ability.extra.contains7 = true
@@ -1555,29 +1518,25 @@ SMODS.Joker{
 			end
 		end
 
-		if not context.blueprint and context.destroying_card then
-			for i = 1, #context.scoring_hand do 
-				if context.scoring_hand[i]:get_id() == 9 and card.ability.extra.contains7 then
-					G.E_MANAGER:add_event(Event({
-						trigger = 'after',
-						delay = 0.2,
-						func = function() 
-								local diff_card = context.scoring_hand[i]
-								if diff_card.ability.name == 'Glass Card' then 
-									diff_card:shatter()
-								else
-									diff_card:start_dissolve()
-								end return true end }))
-					ease_dollars(card.ability.extra.dollars)
-					card.ability.extra.contains7 = false
-					return {
-						remove = true,
-						card = context.scoring_hand[i],
-						message = "Yummy"
-					}
+		if context.individual and context.cardarea == G.play and not context.blueprint then
+			if context.other_card:get_id() == 9 and card.ability.extra.contains7 then
+				if not contains(card.ability.extra.to_destroy, context.other_card) then
+					card.ability.extra.to_destroy[#card.ability.extra.to_destroy + 1] = context.other_card
 				end
 			end
-			card.ability.extra.contains7 = false
+		end
+
+		if context.destroying_card and not context.blueprint then
+			if not card.ability.extra.money_granted and contains(card.ability.extra.to_destroy, context.destroying_card) then
+				card.ability.extra.money_granted = true
+				ease_dollars(card.ability.extra.dollars)
+			end
+			return contains(card.ability.extra.to_destroy, context.destroying_card)
+		end
+
+		if context.after and not context.blueprint then
+			card.ability.extra.to_destroy = nil
+			card.ability.extra.money_granted = false
 		end
 	end
 }
@@ -1695,6 +1654,14 @@ SMODS.Joker{
 			return {
 				Xmult = card.ability.extra.Xmult,
 			}
+		end
+		if context.end_of_round and context.main_eval and card.ability.extra.count < card.ability.extra.actual_rounds and not context.blueprint then
+			card.ability.extra.count = card.ability.extra.count + 1
+			if card.ability.extra.count == card.ability.extra.actual_rounds then
+				return {
+					message = "Blessed!"
+				}
+			end
 		end
 	end
 }

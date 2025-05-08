@@ -7,7 +7,7 @@
     "main_file": "milatro.lua",
     "badge_colour": "008000",
     "dependencies": [
-        "Steamodded (>=1.0.0~ALPHA-1225a)"
+        "Steamodded (>=1.0.0~BETA-0506a)"
     ],
     "version": "2.DEV.0"
 }
