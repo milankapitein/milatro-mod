@@ -1460,8 +1460,6 @@ SMODS.Joker{
 		}
 	},
 
-	config = { vars = { enhancement = ""} },
-
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
 		return { vars = { G.GAME.current_round.butterfly_card.enhancement}}
