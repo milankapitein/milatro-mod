@@ -144,3 +144,51 @@ SMODS.Consumable{
         ease_dollars(-1 * card.ability.extra.money_loss, true)
     end
 }
+
+-- Burst (change name maybe)
+SMODS.Consumable{
+    key = 'burst',
+
+    loc_txt = {
+        name = "Burst",
+        text = {
+            "Create a random {C:attention}Tag{}"
+        }
+    },
+
+    object_type = "Consumable",
+    set = 'Spectral',
+
+    cost = 4,
+    atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+    unlocked = true,
+    discovered = true,
+
+    can_use = function(self, card)
+        return true
+    end,
+
+    use = function(self, card, area, copier)
+        local count = 0
+        local random = pseudorandom(pseudoseed("burst"), 1, get_table_size(G.P_TAGS))
+        for k in pairs(G.P_TAGS) do
+            if count == random then
+                local tag = Tag(k)
+                if tag.name == "Orbital Tag" then
+                    tag.ability.orbital_hand = G.handlist[pseudorandom('orbital_hand', 1, #G.handlist)]
+                end
+                G.E_MANAGER:add_event(Event({
+                    func = (function()
+                        add_tag(tag)
+                        play_sound('generic1', 0.9 + math.random() * 0.1, 0.8)
+                        play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+                        return true
+                    end)
+                }))
+            end
+            count = count + 1
+        end
+    end
+
+}

@@ -51,3 +51,129 @@ SMODS.Enhancement{
         end
     end
 }
+
+-- Wheel Tag
+SMODS.Tag{
+    key = 'wheel_skip',
+
+    loc_txt = {
+        name = 'Wheel Tag',
+        text = {
+            "Adds Foil, Holographic or",
+            "Polychrome to all Jokers"
+        }
+    },
+
+    atlas = 'MilatroModDecks',
+	pos = { x = 0, y = 0 },
+
+    discovered = true,
+    min_ante = 3,
+
+    apply = function(self, tag, context)
+        if context.type == 'immediate' then
+            local elig_cards = 0
+            for i = 1, #G.jokers.cards do
+                if not G.jokers.cards[i].edition then
+                    elig_cards = elig_cards + 1
+                end
+            end
+            if elig_cards == 0 then return false end
+            for i = 1, #G.jokers.cards do
+                if not G.jokers.cards[i].edition then
+                    G.jokers.cards[i]:set_edition(poll_edition('wheel_of_fortune', nil, true, true))
+                end
+            end
+            tag:yep('+', G.C.BLUE, function()
+                return true
+            end)
+            tag.triggered = true
+            return true
+        end
+    end
+}
+
+-- Cleanse Tag
+SMODS.Tag{
+    key = 'cleanse',
+
+    loc_txt = {
+        name = 'Cleanse Tag',
+        text = {
+            "Removes Rental, Perishable,",
+            "Debuffed, Eternal and Pinned property",
+            "from all Jokers"
+        }
+    },
+
+    atlas = 'MilatroModDecks',
+	pos = { x = 0, y = 0 },
+
+    discovered = true,
+    min_ante = 2,
+
+    apply = function(self, tag, context)
+        if context.type == 'immediate' then
+            local triggers = 0
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i].ability.eternal then
+                    G.jokers.cards[i].ability.eternal = false
+                    triggers = triggers + 1
+                end
+                if G.jokers.cards[i].ability.rental then
+                    G.jokers.cards[i].ability.rental = false
+                    triggers = triggers + 1
+                end
+                if G.jokers.cards[i].pinned then
+                    G.jokers.cards[i].pinned = false
+                    triggers = triggers + 1
+                end
+                if G.jokers.cards[i].ability.perishable then
+                    G.jokers.cards[i].ability.perishable = false
+                    triggers = triggers + 1
+                end
+                if G.jokers.cards[i].debuff then
+                    G.jokers.cards[i].debuff = false
+                    triggers = triggers + 1
+                end
+            end
+            if triggers == 0 then return false end
+            tag:yep('+', G.C.BLUE, function()
+                return true
+            end)
+            tag.triggered = true
+            return true
+        end
+    end
+}
+
+-- Playing Tag
+SMODS.Tag{
+    key = 'playing',
+
+    loc_txt = {
+        name = 'Playing Tag',
+        text = {
+            "Next round, get +3 hands",
+            "and +3 discards"
+        }
+    },
+
+    atlas = 'MilatroModDecks',
+	pos = { x = 0, y = 0 },
+
+    discovered = true,
+    min_ante = 2,
+
+    apply = function(self, tag, context)
+		if context.type == "round_start_bonus" then
+			tag:yep("+", G.C.BLUE, function()
+				return true
+			end)
+			ease_hands_played(3)
+			ease_discard(3)
+			tag.triggered = true
+			return true
+		end
+    end
+}

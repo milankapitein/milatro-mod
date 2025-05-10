@@ -48,6 +48,15 @@ to_number = to_number or function(x)
     return x
 end
 
+contains = function(table, item)
+    for k, v in pairs(table) do
+        if v == item then
+            return true
+        end
+    end
+    return false
+end
+
 get_suits_count = function(context)
 	local suits = {
 		["Hearts"] = 0,
