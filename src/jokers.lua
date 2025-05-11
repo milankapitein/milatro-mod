@@ -1390,30 +1390,6 @@ SMODS.Joker{
 }
 
 -- Butterfly Effect
---TODO: find a list of all enhancements, in case of a mod adding enhanced
-local enhancements_list = {
-	"Lucky Card",
-	"Glass Card",
-	"Mult Card",
-	"Bonus Card",
-	"Stone Card",
-	"Steel Card",
-	"Gold Card",
-}
-
-local igo = Game.init_game_object
-function Game:init_game_object()
-	local ret = igo(self)
-	ret.current_round.butterfly_card = { enhancement = enhancements_list[1]}
-	return ret
-end
-
-function SMODS.current_mod.reset_game_globals(run_start)
-	G.GAME.current_round.butterfly_card = { enhancement = enhancements_list[1] }
-	local butterfly_card = pseudorandom("butterfly", 1, #enhancements_list)
-	G.GAME.current_round.butterfly_card.enhancement = enhancements_list[butterfly_card]
-end
-
 SMODS.current_mod.optional_features = { quantum_enhancements = true }
 
 SMODS.Joker{
@@ -1431,7 +1407,7 @@ SMODS.Joker{
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
-		return { vars = { G.GAME.current_round.butterfly_card.enhancement}}
+		return { vars = {G.GAME.current_round.butterfly_card.enhancement}}
 	end,
 
 	rarity = 2,
@@ -1473,6 +1449,10 @@ SMODS.Joker{
 				elseif G.GAME.current_round.butterfly_card.enhancement == "Gold Card" then
 					return {
 						m_gold = true
+					}
+				elseif G.GAME.current_round.butterfly_card.enhancement == "Ice Card" then
+					return {
+						m_mlnc_ice = true
 					}
 				end
 			end

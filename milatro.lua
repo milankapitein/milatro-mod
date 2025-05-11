@@ -86,20 +86,10 @@ get_table_size = function(table)
 	return count
 end
 
-local enhancements_list = {
-	"Lucky Card",
-	"Glass Card",
-	"Mult Card",
-	"Bonus Card",
-	"Stone Card",
-	"Steel Card",
-	"Gold Card"
-}
-
 local igo = Game.init_game_object
 function Game:init_game_object()
 	local ret = igo(self)
-	ret.current_round.butterfly_card = { enhancement = enhancements_list[1]}
+	ret.current_round.butterfly_card = { enhancement =  get_bfly_name(G.P_CENTER_POOLS["Enhanced"][1])}
 	ret.current_round.eye_rank = { id = 2, name = "2"}
 	return ret
 end
@@ -111,10 +101,37 @@ get_rank_id = function(id)
 	return "ERROR"
 end
 
+get_bfly_name = function(enhancement)
+	-- normal case
+	if string.find(enhancement.name, "Card") ~= nil and string.find(enhancement.name, "_") == nil then
+		return enhancement.name
+	end
+	-- bonus/mult case
+	if string.find(enhancement.name, "Card") == nil and string.find(enhancement.name, "_") == nil then
+		return enhancement.name .. " Card"
+	end
+	-- modded case
+	if string.find(enhancement.name, "Card") == nil and string.find(enhancement.name, "_") ~= nil then
+		local i = string.find(enhancement.name, "_", 3)
+		local len = string.len(enhancement.name)
+		local real_enhancement_name = string.sub(enhancement.name, i+1, len)
+		real_enhancement_name = string.upper(string.sub(real_enhancement_name, 1, 1)) .. string.sub(real_enhancement_name, 2, string.len(real_enhancement_name))
+		return real_enhancement_name .. " Card"
+	end
+	return "ERROR"
+end
+
 function SMODS.current_mod.reset_game_globals(run_start)
-	G.GAME.current_round.butterfly_card = { enhancement = enhancements_list[1] }
-	local butterfly_card = pseudorandom("butterfly", 1, #enhancements_list)
-	G.GAME.current_round.butterfly_card.enhancement = enhancements_list[butterfly_card]
+	local valid_bfly = {}
+	for i = 1, get_table_size(G.P_CENTER_POOLS["Enhanced"]) do
+		if G.P_CENTER_POOLS["Enhanced"][i].name ~= "Wild Card" then 
+			--update this if i can find a way to easily return enhancement in one line, but since i cant (yet) i need to add specific mod capability
+			if string.find(G.P_CENTER_POOLS["Enhanced"][i].name, "mlnc") ~= nil or string.find(G.P_CENTER_POOLS["Enhanced"][i].name, "_", 3) == nil then
+				valid_bfly[#valid_bfly+1] = G.P_CENTER_POOLS["Enhanced"][i]
+			end
+		end
+	end
+	G.GAME.current_round.butterfly_card.enhancement =  get_bfly_name(pseudorandom_element(valid_bfly, pseudoseed("butterfly")))
 
 	local valid_eye = {}
     for i = 2, 14 do
