@@ -2905,3 +2905,43 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Coin Flip
+SMODS.Joker{
+	key = 'coin_flip',
+
+	loc_txt = {
+		name = 'Coin Flip',
+		text = {
+			"Played cards with a {C:gold}Gold Seal{} have a",
+			"{C:green}#1# in #2#{} chance to retrigger {C:attention}#3#{} times"
+		}
+	},
+
+	config = { extra = {max = 2, retriggers = 2}},
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_SEALS.Gold
+		return { vars = {G.GAME and G.GAME.probabilities.normal or 1, card.ability.extra.max, card.ability.extra.retriggers}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 4,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.repetition and context.cardarea == G.play and context.other_card.seal == 'Gold' then
+			if pseudorandom('coinflip') < (G.GAME and G.GAME.probabilities.normal)/card.ability.extra.max then
+				return {
+                    message = localize('k_again_ex'),
+					repetitions = card.ability.extra.retriggers
+				}
+			end
+		end
+	end
+}
