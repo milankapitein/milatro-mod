@@ -64,7 +64,7 @@ SMODS.Consumable{
         name = 'Necromancer',
         text = {
             "Create a random {C:spectral}Spectral{} card",
-            "{C:inactive}Must have room{}" }
+            "{C:inactive}(Must have room){}" }
     },
 
     object_type = "Consumable",
@@ -191,4 +191,44 @@ SMODS.Consumable{
         end
     end
 
+}
+
+-- Designer (also maybe change later)
+SMODS.Consumable{
+    key = 'designer',
+
+    loc_txt = {
+        name = "The Designer",
+        text = {
+            "Adds a random {C:attention}Enhancement{}",
+            "to {C:attention}#1#{} random cards"
+        }
+    },
+
+    config = { extra = 2},
+
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra }}
+    end,
+
+    object_type = "Consumable",
+    set = 'Tarot',
+
+    cost = 4,
+    atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+    unlocked = true,
+    discovered = true,
+
+    can_use = function(self, card)
+        return #G.hand.highlighted >= 1 and #G.hand.highlighted <= card.ability.extra
+    end,
+
+    use = function(self, card, area, copier)
+        Use_tarot(false, copier or card)
+        for i = 1, #G.hand.highlighted do
+            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function() G.hand.highlighted[i]:set_ability(pseudorandom_element(G.P_CENTER_POOLS["Enhanced"], pseudoseed("designer")));return true end }))
+        end
+        Use_tarot(true, copier or card)
+    end
 }
