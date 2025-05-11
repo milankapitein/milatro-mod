@@ -2860,3 +2860,48 @@ SMODS.Joker{
 		end
 	end
 }
+
+-- Jack of All Trades
+get_played_count = function()
+	local count = 0
+	for i = 1, #G.handlist do
+		if 	G.GAME.hands[G.handlist[i]].played > 0 then count = count + 1 end
+	end
+	return count
+end
+
+SMODS.Joker{
+	key = 'jack_of_all_trades',
+
+	loc_txt = {
+		name = 'Jack of all Trades',
+		text = {
+			"{C:white,X:mult}X#1#{} Mult for each",
+			"unique Poker Hand played this run",
+			"{C:inactive}(Currently {C:white,X:mult}X#2#{C:inactive} Mult)"
+		}
+	},
+
+	config = { extra = {xmult_gain = 0.25, xmult = 1}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.xmult_gain, card.ability.extra.xmult + card.ability.extra.xmult_gain * get_played_count()}}
+	end,
+
+	rarity = 3,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 9,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			return {
+				xmult = card.ability.extra.xmult + card.ability.extra.xmult_gain * get_played_count()
+			}
+		end
+	end
+}
