@@ -1400,7 +1400,7 @@ SMODS.Joker{
 		text = {
 			"{C:attention}Wild Cards{} have the ",
 			"additional effect of {C:attention}#1#s{}",
-			"Enhancement changes at ",
+			"Additional enhancement changes at ",
 			"the end of each round"
 		}
 	},
@@ -2791,8 +2791,8 @@ SMODS.Joker{
 
 	rarity = 3,
 	atlas = 'MilatroMod',
-	pos = { x = 0, y = 0 },
-	cost = 4,
+	pos = { x = 5, y = 3 },
+	cost = 8,
 
 	unlocked = true,
 	discovered = true,
@@ -2988,3 +2988,4 @@ SMODS.Joker{
 		end
 	end
 }
+
