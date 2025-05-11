@@ -1755,6 +1755,7 @@ function get_backpack_count()
 	end
 	return count
 end
+
 SMODS.Joker{
 	key = 'backpack',
 
@@ -2942,6 +2943,48 @@ SMODS.Joker{
 					repetitions = card.ability.extra.retriggers
 				}
 			end
+		end
+	end
+}
+
+-- Toxic Waste
+SMODS.Joker{
+	key = 'toxic_waste',
+
+	loc_txt = {
+		name = 'Toxic Waste',
+		text = {
+			"{C:white,X:chips}X#1#{} Chips if a {C:tarot}Tarot{}",
+			"or {C:planet}Planet{} card is in your consumable area",
+			"{C:white,X:chips}X#2#{} Chips if a {C:spectral}Spectral{}",
+			"is in your consumable area instead"
+		}
+	},
+
+	config = {extra = {tp_xchips = 1.5, s_xchips = 2}},
+
+	loc_vars = function(self, info_queue, card)
+		return { vars = {card.ability.extra.tp_xchips, card.ability.extra.s_xchips}}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 7,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local retval = 1
+			for k, v in pairs(G.consumeables.cards) do
+				if (v ~= nil) and v.ability.set == 'Spectral' then retval = card.ability.extra.s_xchips else retval = math.max(retval, card.ability.extra.tp_xchips) end
+			end
+			return {
+				xchips = retval
+			}
 		end
 	end
 }
