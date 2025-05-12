@@ -2989,3 +2989,126 @@ SMODS.Joker{
 	end
 }
 
+-- Glitched Joker
+SMODS.Joker{
+	key = 'glitched_joker',
+
+	loc_txt = {
+		name = 'Glitched Joker',
+		text = {
+			"{E:2}Random Effect",
+			"including {C:red}bad effects{}..."
+		}
+	},
+
+	rarity = 1,
+	atlas = 'MilatroMod',
+	pos = { x = 0, y = 0 },
+	cost = 5,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+
+	calculate = function(self, card, context)
+		if context.joker_main then
+			local thunk = pseudorandom("glitch", 1, 35)
+			if thunk < 9 then --+mult
+				return {
+					mult = pseudorandom("glitch", -5, 25)
+				}
+			elseif thunk < 18 then --+chips
+				return {
+					chips = pseudorandom("glitch", -35, 80)
+				}
+			elseif thunk < 24 then --xmult
+				local vals = { 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2}
+				return {
+					xmult = vals[pseudorandom("glitch", 1, 13)]
+				}
+			elseif thunk < 28 then --xchips
+				local vals = { 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2}
+				return {
+					xchips = vals[pseudorandom("glitch", 1, 13)]
+				}
+			elseif thunk < 30 then --change blind score
+				local vals = { 0.7, 0.8, 0.9, 1, 1.1, 1.2}
+				G.E_MANAGER:add_event(Event({
+					trigger = 'immediate',
+					delay = 0.0,
+					func = (function()
+						G.GAME.blind.chips = math.floor(G.GAME.blind.chips * vals[pseudorandom("glitch", 1, 6)])
+						G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+
+						local chips_UI = G.hand_text_area.blind_chips
+						G.FUNCS.blind_chip_UI_scale(G.hand_text_area.blind_chips)
+						G.HUD_blind:recalculate()
+						chips_UI:juice_up()
+
+						if not silent then play_sound('chips2') end
+						return true
+					end)
+				}))
+				return {
+					message = "Blind size changed!"
+				}
+			elseif thunk < 33 then --+money
+				local val = pseudorandom("glitch", -3, 10)
+				G.GAME.dollar_buffer = (G.GAME.dollar_buffer or 0) + val
+				G.E_MANAGER:add_event(Event({
+					func = (function()
+						G.GAME.dollar_buffer = 0; return true
+					end)
+				}))
+				return {
+					dollars = val,
+					colour = G.C.MONEY
+				}
+			elseif thunk < 34 then --tag
+				local count = 1
+				local random = pseudorandom(pseudoseed("worldrecordpace"), 1, get_table_size(G.P_TAGS))
+				for k in pairs(G.P_TAGS) do
+					if count == random then
+						local tag = Tag(k)
+						if tag.name == "Orbital Tag" then
+							tag.ability.orbital_hand = G.handlist[pseudorandom('orbital_hand', 1, #G.handlist)]
+						end
+						G.E_MANAGER:add_event(Event({
+							func = (function()
+								add_tag(tag)
+								play_sound('generic1', 0.9 + math.random() * 0.1, 0.8)
+								play_sound('holo1', 1.2 + math.random() * 0.1, 0.4)
+								return true
+							end)
+						}))
+					end
+					count = count + 1
+				end
+			else --random neg consumable
+				G.E_MANAGER:add_event(Event({
+					func = function()
+						local card
+						local typeConsumable = pseudorandom(pseudoseed('slot_machine'), 1, 3)
+						if (typeConsumable == 1) then
+							card = create_card('Tarot', G.consumables, nil, nil, nil, true)
+						end
+						if (typeConsumable == 2) then
+							card = create_card('Planet', G.consumables, nil, nil, nil, true)
+						end
+						if (typeConsumable == 3) then
+							card = create_card('Spectral', G.consumables, nil, nil, nil, true)
+						end
+						card:set_edition('e_negative', true)
+						card:add_to_deck()
+						G.consumeables:emplace(card)
+						return true
+					end
+				}))
+				return {
+					message = "+1 Consumable"
+				}
+			end
+		end
+	end
+}
+
