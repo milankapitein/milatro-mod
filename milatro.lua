@@ -5,6 +5,95 @@ SMODS.load_file("src/blinds.lua")()
 SMODS.load_file("src/consumables.lua")()
 SMODS.load_file("src/misc.lua")()
 
+SMODS.current_mod.extra_tabs = function()
+	return {
+		label = "Shoutouts",
+		tab_definition_function = function()
+			return {
+				n = G.UIT.ROOT,
+				config = {
+					align = "cm",
+					padding = 0.05,
+					colour = G.C.CLEAR,
+				},
+				nodes = {
+					{
+						n = G.UIT.R,
+						config = {
+							padding = 0,
+							align = "cm"
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = "Thank you to Emiliavi for making most of the beautiful art",
+									shadow = false,
+									scale = 0.4,
+									colour = G.C.PURPLE
+								}
+							}
+						}
+					},
+					{
+						n = G.UIT.R,
+						config = {
+							padding = 0,
+							align = "cm"
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = "Thank you to Emmakyu for helping with the code at certain points",
+									shadow = false,
+									scale = 0.4,
+									colour = G.C.PURPLE
+								}
+							}
+						}
+					},
+					{
+						n = G.UIT.R,
+						config = {
+							padding = 0,
+							align = "cm"
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = "Names above are based on BlueSky handle",
+									shadow = false,
+									scale = 0.3,
+									colour = G.C.BLUE
+								}
+							}
+						}
+					},
+					{
+						n = G.UIT.R,
+						config = {
+							padding = 0,
+							align = "cm"
+						},
+						nodes = {
+							{
+								n = G.UIT.T,
+								config = {
+									text = "Lastly, thanks to everyone playing and giving feedback on the mod.",
+									shadow = false,
+									scale = 0.4,
+									colour = G.C.PURPLE
+								}
+							}
+						}
+					}
+				}
+			}
+		end
+	}
+end
 
 SMODS.Atlas {
 	-- Key for code to find it with

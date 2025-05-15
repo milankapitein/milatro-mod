@@ -145,12 +145,12 @@ SMODS.Consumable{
     end
 }
 
--- Burst (change name maybe)
+-- Totem
 SMODS.Consumable{
-    key = 'burst',
+    key = 'totem',
 
     loc_txt = {
-        name = "Burst",
+        name = "Totem",
         text = {
             "Create a random {C:attention}Tag{}"
         }

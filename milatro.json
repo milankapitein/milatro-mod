@@ -1,7 +1,7 @@
 {
     "id": "MilatroMod",
     "name": "Milatro",
-    "author": ["Milan, Emilia, Emma"],
+    "author": ["Milan"],
     "description": "Milan's cool mod that adds a bunch of different stuff, such as Jokers, decks, blinds and more. Enjoy!",
     "prefix": "mlnc",
     "main_file": "milatro.lua",

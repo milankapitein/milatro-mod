@@ -2650,6 +2650,7 @@ SMODS.Joker{
 	unlocked = true,
 	discovered = true,
 	blueprint_compat = true,
+	eternal_compat = false,
 
 	calculate = function(self, card, context)
 		if context.selling_self then
@@ -3112,3 +3113,44 @@ SMODS.Joker{
 	end
 }
 
+SMODS.Joker{
+	key = 'temp',
+
+	loc_txt = {
+		name = 'Wheel Tag Fiesta',
+		text = {
+			"Sell this Joker to create {C:attention}#1#{}",
+			"free {C:attention}Juggle Tags{}"
+		}
+	},
+
+	config = { extra = {tags = 2} },
+
+	loc_vars = function(self, info_queue, card)
+		info_queue[#info_queue+1] = G.P_TAGS.tag_juggle
+		return { vars = {card.ability.extra.tags }}
+	end,
+
+	rarity = 2,
+	atlas = 'MilatroMod',
+	pos = { x = 8, y = 1 },
+	cost = 6,
+
+	unlocked = true,
+	discovered = true,
+	blueprint_compat = true,
+	eternal_compat = false,
+
+	calculate = function(self, card, context)
+		if context.selling_self then
+				G.E_MANAGER:add_event(Event({
+					func = (function()
+						add_tag(Tag('tag_mlnc_wheel_skip'))
+						play_sound('generic1', 0.9 + math.random()*0.1, 0.8)
+						play_sound('holo1', 1.2 + math.random()*0.1, 0.4)
+						return true
+					end)
+				}))	
+		end
+	end
+}

@@ -60,9 +60,15 @@ SMODS.Tag{
         name = 'Wheel Tag',
         text = {
             "Adds Foil, Holographic or",
-            "Polychrome to all Jokers"
+            "Polychrome to {C:attention}#1#{} Jokers"
         }
     },
+
+    config = { extra = 2},
+
+    loc_vars = function(self, info_queue)
+        return { vars = {self.config.extra }}
+    end,
 
     atlas = 'MilatroModDecks',
 	pos = { x = 0, y = 0 },
@@ -72,17 +78,16 @@ SMODS.Tag{
 
     apply = function(self, tag, context)
         if context.type == 'immediate' then
-            local elig_cards = 0
+            local temp_jonklers = {}
             for i = 1, #G.jokers.cards do
                 if not G.jokers.cards[i].edition then
-                    elig_cards = elig_cards + 1
+                    temp_jonklers[#temp_jonklers+1] = G.jokers.cards[i]
                 end
             end
-            if elig_cards == 0 then return false end
-            for i = 1, #G.jokers.cards do
-                if not G.jokers.cards[i].edition then
-                    G.jokers.cards[i]:set_edition(poll_edition('wheel_of_fortune', nil, true, true))
-                end
+            if #temp_jonklers == 0 then return false end
+            pseudoshuffle(temp_jonklers, pseudoseed('t_wheel'))
+            for i = 1, math.min(tag.config.extra, #temp_jonklers) do
+                temp_jonklers[i]:set_edition(poll_edition('wheel_of_fortune', nil, true, true))
             end
             tag:yep('+', G.C.BLUE, function()
                 return true
@@ -100,8 +105,8 @@ SMODS.Tag{
     loc_txt = {
         name = 'Cleanse Tag',
         text = {
-            "Removes Rental, Perishable,",
-            "Debuffed, Eternal and Pinned property",
+            "Removes {C:attention}Rental{}, {C:attention}Perishable{},",
+            "{C:attention}Debuffed{}, {C:attention}Eternal{} and {C:attention}Pinned{} property",
             "from all Jokers"
         }
     },
@@ -154,10 +159,16 @@ SMODS.Tag{
     loc_txt = {
         name = 'Playing Tag',
         text = {
-            "Next round, get +3 hands",
-            "and +3 discards"
+            "Next round, get {C:blue}+#1# hands{}",
+            "and {C:red}+#1# discards"
         }
     },
+
+    config = { extra = 3},
+
+    loc_vars = function(self, info_queue)
+        return { vars = {self.config.extra}}
+    end,
 
     atlas = 'MilatroModDecks',
 	pos = { x = 0, y = 0 },
@@ -170,8 +181,8 @@ SMODS.Tag{
 			tag:yep("+", G.C.BLUE, function()
 				return true
 			end)
-			ease_hands_played(3)
-			ease_discard(3)
+			ease_hands_played(tag.config.extra)
+			ease_discard(tag.config.extra)
 			tag.triggered = true
 			return true
 		end
