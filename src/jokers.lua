@@ -770,16 +770,21 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before then
-			G.GAME.consumeable_buffer = #G.consumeables.cards
+			-- G.GAME.consumeable_buffer = #G.consumeables.cards
+			sendTraceMessage(tostring(#G.consumeables.cards), "milatro")
+			sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro")
+			sendTraceMessage(tostring(G.consumeables.config.card_limit), "milatro")
 			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
-		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 and G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not card.debuff then
+		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 
+		and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit and not card.debuff then
 			if pseudorandom('reaper') < G.GAME.probabilities.normal/card.ability.extra.odds then
 				G.E_MANAGER:add_event(Event({
 					func = function()
 						card = create_card(nil, G.consumables, nil, nil, nil, nil, 'c_death')
 						card:add_to_deck()
 						G.consumeables:emplace(card)
+						G.GAME.consumeable_buffer = 0
 						return true
 					end
 				}))
@@ -1163,6 +1168,7 @@ SMODS.Joker{
 						local card = create_card(card_type,G.consumeables, nil, nil, nil, nil, _planet, 'blusl')
 						card:add_to_deck()
 						G.consumeables:emplace(card)
+						G.GAME.consumeable_buffer = 0
 					end
 					return true
 				end)}))
@@ -1173,6 +1179,7 @@ SMODS.Joker{
                         local card = create_card('Tarot',G.consumeables, nil, nil, nil, nil, nil, '8ba')
                         card:add_to_deck()
                         G.consumeables:emplace(card)
+						G.GAME.consumeable_buffer = 0
                     return true
                 end)}))
 				G.GAME.consumeable_buffer = G.GAME.consumeable_buffer + 1
@@ -2339,7 +2346,7 @@ SMODS.Joker{
 	calculate = function(self, card, context)
 		if context.joker_main then
 			local count = 0
-			for i = 1, card.ability.extra.req_cards do 
+			for i = 1, #context.full_hand do 
 				if G.GAME.current_round.eye_rank.id == context.full_hand[i]:get_id() then count = count + 1 end
 			end	
 			if count == card.ability.extra.req_cards and #G.consumeables.cards + G.GAME.consumeable_buffer < G.consumeables.config.card_limit then
@@ -2395,17 +2402,18 @@ SMODS.Joker{
 			local nonface = false
 			for i = 1, #context.scoring_hand do
 				if not context.scoring_hand[i]:is_face() then nonface = true end
-				if nonface then
-					card.ability.extra.mult = 0
-					return {
-						message = localize('k_reset')
-					}
-				else
-					card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
-					return {
-						message = localize('k_upgrade_ex')
-					}
-				end
+			end
+			if not nonface then
+				card.ability.extra.mult = card.ability.extra.mult + card.ability.extra.mult_gain
+				return {
+					message = localize('k_upgrade_ex')
+				}
+			else
+				if card.ability.extra.mult == 0 then return end
+				card.ability.extra.mult = 0
+				return {
+					message = localize('k_reset')
+				}
 			end
 		end
 		if context.joker_main then
@@ -2780,7 +2788,7 @@ SMODS.Joker{
 		name = 'Binary',
 		text = {
 			"{C:white,X:mult}X#1#{} Mult if played hand",
-			"contains exactly {C:attention}#2#{} unique {C:attention}suits"
+			"has exactly {C:attention}#2#{} unique {C:attention}suits"
 		}
 	},
 

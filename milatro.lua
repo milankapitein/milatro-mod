@@ -185,7 +185,7 @@ end
 
 get_rank_id = function(id)
 	if id <= 0 then return "Stone" end
-	if id > 2 and id <= 10 then return tostring(id) end
+	if id >= 2 and id <= 10 then return tostring(id) end
 	if id == 11 then return "Jack" elseif id == 12 then return "Queen" elseif id == 13 then return "King" elseif id == 14 then return "Ace" end
 	return "ERROR"
 end
@@ -228,5 +228,6 @@ function SMODS.current_mod.reset_game_globals(run_start)
     end
     local eye_card = pseudorandom_element(valid_eye, pseudoseed('eye'..G.GAME.round_resets.ante))
     G.GAME.current_round.eye_rank.id = eye_card
+	sendTraceMessage(tostring(eye_card), 'milatro')
 	G.GAME.current_round.eye_rank.name = get_rank_id(eye_card)
 end
