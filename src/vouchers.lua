@@ -184,6 +184,7 @@ function Game:start_run(args)
   if G.GAME.used_vouchers.v_mlnc_deconstruction then
     for k,v in pairs(G.P_BLINDS) do
       if G.P_BLINDS[k].boss ~= nil then
+        -- doesnt reset properly????
         G.P_BLINDS[k].mult = G.P_BLINDS[k].mult * (1/0.85714285714) * (1/0.875)
       end
     end

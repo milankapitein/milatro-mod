@@ -79,23 +79,13 @@ SMODS.Blind{
     boss_colour = HEX("291a59"),
 
 	set_blind = function(self)
-		local length = 0
+		local blinds = {}
 		for k,v in pairs(G.P_BLINDS) do 
-			if G.P_BLINDS[k].boss ~= nil and G.P_BLINDS[k].boss.showdown == nil then
-				length = length + 1
+			if v.boss ~= nil and v.boss.showdown == nil then
+				blinds[#blinds+1] = v
 			end
 		end
-
-		local selection = pseudorandom("illusion", 1, length)
-
-		local count = 1
-		for k,v in pairs(G.P_BLINDS) do
-			if count == selection then
-				G.GAME.blind:set_blind(G.P_BLINDS[k], false, false)
-				return
-			end
-			count = count + 1
-		end
+		G.GAME.blind:set_blind(pseudorandom_element(blinds, pseudoseed("cover")), false, false)
 	end
 }
 

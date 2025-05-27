@@ -45,7 +45,7 @@ SMODS.current_mod.extra_tabs = function()
 							{
 								n = G.UIT.T,
 								config = {
-									text = "Thank you to Emmakyu for helping with the code at certain points",
+									text = "Thank you to emmakyu for helping with the code at certain points",
 									shadow = false,
 									scale = 0.4,
 									colour = G.C.PURPLE
@@ -228,6 +228,5 @@ function SMODS.current_mod.reset_game_globals(run_start)
     end
     local eye_card = pseudorandom_element(valid_eye, pseudoseed('eye'..G.GAME.round_resets.ante))
     G.GAME.current_round.eye_rank.id = eye_card
-	sendTraceMessage(tostring(eye_card), 'milatro')
 	G.GAME.current_round.eye_rank.name = get_rank_id(eye_card)
 end

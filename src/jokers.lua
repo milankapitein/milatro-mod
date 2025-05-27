@@ -770,10 +770,6 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.before then
-			-- G.GAME.consumeable_buffer = #G.consumeables.cards
-			sendTraceMessage(tostring(#G.consumeables.cards), "milatro")
-			sendTraceMessage(tostring(G.GAME.consumeable_buffer), "milatro")
-			sendTraceMessage(tostring(G.consumeables.config.card_limit), "milatro")
 			card.ability.extra.last_hand = next(context.poker_hands['Pair'])
 		end
 		if context.end_of_round and not context.individual and not context.repetition and card.ability.extra.last_hand == 1 
@@ -1641,14 +1637,6 @@ SMODS.Joker{
 			return {
 				Xmult = card.ability.extra.Xmult,
 			}
-		end
-		if context.end_of_round and context.main_eval and card.ability.extra.count < card.ability.extra.actual_rounds and not context.blueprint then
-			card.ability.extra.count = card.ability.extra.count + 1
-			if card.ability.extra.count == card.ability.extra.actual_rounds then
-				return {
-					message = "Blessed!"
-				}
-			end
 		end
 	end
 }
@@ -2566,7 +2554,7 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Frozen Joker',
 		text = {
-			"All {C:attention}Enhanced {}cards are",
+			"All scoring {C:attention}Enhanced {}cards are",
 			"turned into {C:attention}Ice {}cards"
 		}
 	},
@@ -2586,7 +2574,7 @@ SMODS.Joker{
 	blueprint_compat = false,
 
 	calculate = function(self, card, context)
-		if context.before then
+		if context.before and not context.blueprint then
 			local count = 0
 			for i = 1, #context.scoring_hand do
 				--this currently resets buffed ice cards from ice age. maybe get rid of "resetting" ice cards or just on buffed ice cards
