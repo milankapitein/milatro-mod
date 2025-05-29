@@ -1847,7 +1847,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = { extra = {chip_gain = 2, chip = 0}},
+	config = { extra = {chip_gain = 3, chip = 0}},
 
 	loc_vars = function(self, info_queue, card)
 		return { vars = {card.ability.extra.chip_gain, card.ability.extra.chip} }
@@ -2517,7 +2517,7 @@ SMODS.Joker{
 		}
 	},
 
-	config = {extra = {min = 1, max = 5, xchips = 2}},
+	config = {extra = {min = 1, max = 5, xchips = 3}},
 
 	loc_vars = function(self, info_queue, card)
 		info_queue[#info_queue+1] = G.P_CENTERS.m_bonus
