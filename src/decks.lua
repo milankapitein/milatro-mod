@@ -140,15 +140,15 @@ SMODS.Back {
     end
 }
 
--- Unboxing Deck
+-- Cardboard Deck
 SMODS.Back {
-    name = "Unboxing Deck",
+    name = "Cardboard Deck",
     key = "unboxing",
     atlas = "MilatroModDecks",
     pos = {x = 3, y = 0},
 
     loc_txt = {
-        name = "Unboxing Deck",
+        name = "Cardboard Deck",
         text = {
             "Start run with",
             "{C:attention,T:v_mlnc_turbo_v}Turbo Boost{}, {C:attention,T:v_mlnc_nitro_v}Nitro Boost{}",
