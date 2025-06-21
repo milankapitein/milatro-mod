@@ -1578,7 +1578,7 @@ SMODS.Joker{
 	end
 }
 
--- Impending Doom
+-- Mirage
 local hook_new_boss = get_new_boss
 function get_new_boss()
 	if (next(SMODS.find_card('j_mlnc_impending_doom'))) and (G.GAME.round_resets.ante % 8) ~= 0 then 
@@ -1594,7 +1594,7 @@ SMODS.Joker{
 	key = 'impending_doom',
 
 	loc_txt = {
-		name = 'Impending Doom',
+		name = 'Mirage',
 		text = {
 			"{C:white,X:mult}X#1#{} Mult,",
 			"All non-finisher boss blinds ",
@@ -2535,13 +2535,11 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.individual and context.cardarea == G.play then
-			for i = 1, #context.scoring_hand do
-				if context.scoring_hand[i].config.center.key == "m_bonus" and pseudorandom('bonusbonus') < G.GAME.probabilities.normal/card.ability.extra.max then
-					return {
-						xchips = card.ability.extra.xchips,
-						card = card
-					}
-				end
+			if context.other_card.config.center.key == "m_bonus" and pseudorandom('bonusbonus') < G.GAME.probabilities.normal / card.ability.extra.max then
+				return {
+					xchips = card.ability.extra.xchips,
+					card = card
+				}
 			end
 		end
 	end
