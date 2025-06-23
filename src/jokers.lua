@@ -971,6 +971,16 @@ SMODS.Joker{
 	end
 }
 
+function calc_force_of_nature(gain)
+	local thunk = 1
+	for k, v in pairs(G.playing_cards) do
+		if v:get_id() == 4 and v.ability.name == "Wild Card" then
+			thunk = thunk + gain
+		end
+	end
+	return thunk
+end
+
 -- Force of Nature
 SMODS.Joker{
 	key = 'force_of_nature',
@@ -990,13 +1000,9 @@ SMODS.Joker{
 		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
 		card.ability.extra.Xmult = 1
 		if G.STAGE == G.STAGES.RUN then
-			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 4 and v.ability.name == "Wild Card" then
-					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-				end
-			end
+			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult * calc_force_of_nature(1) }}
 		end
-		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult}}
+		return { vars = {card.ability.extra.Xmult_gain, 1}}
 	end,
 
 	rarity = 3,
@@ -1010,13 +1016,8 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
-			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 4 and v.ability.name == "Wild Card" then
-					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-				end
-			end
 			return {
-				Xmult = card.ability.extra.Xmult
+				Xmult = card.ability.extra.Xmult * calc_force_of_nature(1)
 			}
 		end
 	end
@@ -2421,7 +2422,8 @@ SMODS.Joker{
 		name = 'Ritual',
 		text = {
 			"When {C:attention}boss blind{} is defeated,",
-			"create a random {C:spectral}Spectral{} card"
+			"create a random {C:spectral}Spectral{} card",
+			"{C:inactive}(Must have room)"
 		}
 	},
 
@@ -2909,7 +2911,7 @@ SMODS.Joker{
 	loc_txt = {
 		name = 'Coin Flip',
 		text = {
-			"Played cards with a {C:gold}Gold Seal{} have a",
+			"Played or held cards with a {C:gold}Gold Seal{} have a",
 			"{C:green}#1# in #2#{} chance to retrigger {C:attention}#3#{} times"
 		}
 	},
@@ -2931,12 +2933,19 @@ SMODS.Joker{
 	blueprint_compat = true,
 
 	calculate = function(self, card, context)
-		if context.repetition and context.cardarea == G.play and context.other_card.seal == 'Gold' then
-			if pseudorandom('coinflip') < (G.GAME and G.GAME.probabilities.normal)/card.ability.extra.max then
+		if context.repetition and pseudorandom('coinflip') < (G.GAME and G.GAME.probabilities.normal)/card.ability.extra.max then
+			if context.cardarea == G.play and context.other_card.seal == 'Gold' then
 				return {
                     message = localize('k_again_ex'),
 					repetitions = card.ability.extra.retriggers
 				}
+			end
+			if context.cardarea == G.hand and (next(context.card_effects[1]) or #context.card_effects > 1) and context.other_card.seal == 'Gold' then
+				return {
+					message = localize('k_again_ex'),
+					repetitions = card.ability.extra.retriggers,
+					card = context.other_card
+                }
 			end
 		end
 	end

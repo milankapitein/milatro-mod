@@ -137,6 +137,7 @@ SMODS.Voucher{
     return { vars = {} }
   end
 }
+
 -- Deconstruction
 SMODS.Voucher{
   key = "deconstruction",
