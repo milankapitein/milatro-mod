@@ -1000,6 +1000,16 @@ SMODS.Joker{
 	end
 }
 
+function calc_force_of_nature(gain)
+	local thunk = 1
+	for k, v in pairs(G.playing_cards) do
+		if v:get_id() == 4 and v.ability.name == "Wild Card" then
+			thunk = thunk + gain
+		end
+	end
+	return thunk
+end
+
 -- Force of Nature
 SMODS.Joker{
 	key = 'force_of_nature',
@@ -1019,13 +1029,9 @@ SMODS.Joker{
 		info_queue[#info_queue+1] = G.P_CENTERS.m_wild
 		card.ability.extra.Xmult = 1
 		if G.STAGE == G.STAGES.RUN then
-			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 4 and v.ability.name == "Wild Card" then
-					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-				end
-			end
+			return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult * calc_force_of_nature(1) }}
 		end
-		return { vars = { card.ability.extra.Xmult_gain, card.ability.extra.Xmult}}
+		return { vars = {card.ability.extra.Xmult_gain, 1}}
 	end,
 
 	rarity = 3,
@@ -1039,13 +1045,8 @@ SMODS.Joker{
 
 	calculate = function(self, card, context)
 		if context.joker_main then
-			for k, v in pairs(G.playing_cards) do
-				if v:get_id() == 4 and v.ability.name == "Wild Card" then
-					card.ability.extra.Xmult = card.ability.extra.Xmult + card.ability.extra.Xmult_gain
-				end
-			end
 			return {
-				Xmult = card.ability.extra.Xmult
+				Xmult = card.ability.extra.Xmult * calc_force_of_nature(1)
 			}
 		end
 	end
